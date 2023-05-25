@@ -1,0 +1,22 @@
+stages:
+  - build
+
+variables:
+  MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version"
+  MAVEN_OPTS: "-Dmaven.repo.local=${CI_PROJECT_DIR}/.m2/repository"
+  DOCKER_IMAGE_NAME: "my-quarkus-app"
+  DOCKER_REGISTRY: "your-nexus-registry"
+  CANARY_DEPLOY_HOST: "your-canary-deployment-host"
+  OPENSHIFT_NAMESPACE: "your-openshift-namespace"
+  OPENSHIFT_ROUTE_NAME: "your-openshift-route-name"
+
+build:
+  stage: build
+  image: maven:3.8.4-openjdk-8
+  script:
+    - mvn $MAVEN_CLI_OPTS clean package -DskipTests
+  artifacts:
+    paths:
+      - target/*.jar
+
+
