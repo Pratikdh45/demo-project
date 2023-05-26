@@ -4,16 +4,21 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.example</groupId>
+  <groupId>com.coveros.demo</groupId>
   <artifactId>helloworld</artifactId>
   <version>1.1</version>
   <packaging>jar</packaging>
+
+  <name>Hello World</name>
+  <description>The most basic of Java programs.</description>
+  <url>https://www.coveros.com/</url>
+  <inceptionYear>2018</inceptionYear>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <jdk.version>1.8</jdk.version>
-    <quarkus.version>2.2.3.Final</quarkus.version>
+    <quarkus.version>3.1.0.Final</quarkus.version>
     <docker.image.prefix>quay.io</docker.image.prefix>
 
     <maven.compiler.plugin.version>3.8.1</maven.compiler.plugin.version>
@@ -53,16 +58,6 @@
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-maven-plugin</artifactId>
             <version>${quarkus.version}</version>
-            <executions>
-                 <execution>
-                    <goals>
-                        <goal>build</goal>
-                        <goal>generate-code</goal>
-                        <goal>generate-code-tests</goal>
-                        <goal>test-compile</goal>
-                    </goals>
-                </execution>
-            </executions>
             <configuration>
                 <container-image>
                     <build>
