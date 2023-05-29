@@ -27,10 +27,8 @@ test:
     - master
 
 docker_push:
-  stage: deploy
+  stage: docker_push
   image: docker:stable
-  variables:
-    DOCKER_TLS_CERTDIR: "/certs"
   script:
     - docker push "$NEXUS_URL:/repository/docker-private/demo-project/quarkus-helloworld:${project.version}"
   tags:
