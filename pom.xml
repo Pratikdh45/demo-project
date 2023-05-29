@@ -23,7 +23,7 @@
 		<quarkus.platform.version>3.1.0.Final</quarkus.platform.version>
 		<surefire-plugin.version>3.1.0</surefire-plugin.version>
 		<docker.image.prefix>quay.io</docker.image.prefix>
-		<maven.compiler.plugin.version>3.8.1</maven.compiler.plugin.version>
+		<maven.compiler.plugin.version>3.11.0</maven.compiler.plugin.version>
 	</properties>
 	<dependencyManagement>
 		<dependencies>
