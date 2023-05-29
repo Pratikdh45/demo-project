@@ -1,6 +1,7 @@
 stages:
   - build
   - test
+  - docker_push
 
 variables:
   MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version"
