@@ -30,7 +30,7 @@ docker_push:
   stage: docker_push
   image: docker:stable
   script:
-    - docker push "$NEXUS_URL:/repository/docker-private/demo-project/quarkus-helloworld:${project.version}"
+    - docker push "$NEXUS_URL/repository/docker-private/demo-project/quarkus-helloworld:${project.version}"
   tags:
     - master
 
