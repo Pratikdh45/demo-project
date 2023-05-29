@@ -6,6 +6,7 @@ stages:
 variables:
   MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version"
   MAVEN_OPTS: "-Dmaven.repo.local=${CI_PROJECT_DIR}/.m2/repository"
+  DOCKER_REGISTRY: "$NEXUS_URL/repository/docker-private/demo-project"
 
 build:
   stage: build
@@ -30,7 +31,7 @@ docker_push:
   stage: docker_push
   image: docker:stable
   script:
-    - docker push "$NEXUS_URL/repository/docker-private/demo-project/quarkus-helloworld:${project.version}"
+    - docker push "$DOCKER_REGISTRY/quarkus-helloworld:${project.version}"
   tags:
     - master
 
