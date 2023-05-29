@@ -1,5 +1,6 @@
 stages:
   - build
+  - test
 
 variables:
   MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version"
@@ -16,5 +17,10 @@ build:
   tags:
     - master
 
+test:
+  stage: test
+  image: maven:3.8.4-openjdk-8
+  script:
+    - mvn $MAVEN_CLI_OPTS test sonar:sonar -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_LOGIN -Dsonar.password=$SONAR_PASSWORD
 
 
