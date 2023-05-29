@@ -31,7 +31,8 @@ docker_push:
   stage: docker_push
   image: docker:stable
   script:
-    - docker push "$DOCKER_REGISTRY/quarkus-helloworld:${project.version}"
+    - docker build -t ${DOCKER_REGISTRY}/quarkus-helloworld:${project.version} .
+    - docker push ${DOCKER_REGISTRY}/quarkus-helloworld:${project.version}
   tags:
     - master
 
