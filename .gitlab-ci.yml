@@ -22,5 +22,7 @@ test:
   image: maven:latest
   script:
     - mvn $MAVEN_CLI_OPTS test sonar:sonar -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_LOGIN -Dsonar.password=$SONAR_PASSWORD
+  tags:
+    - master
 
 
