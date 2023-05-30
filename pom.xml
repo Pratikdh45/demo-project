@@ -34,7 +34,6 @@
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-resteasy</artifactId>
-            <artifactId>quarkus-container-image-docker</artifactId>
         </dependency>
     </dependencies>
 
