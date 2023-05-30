@@ -12,7 +12,7 @@ build:
   stage: build
   image: maven:latest
   script:
-    - mvn $MAVEN_CLI_OPTS clean install
+    - mvn clean install
     - mvn $MAVEN_CLI_OPTS clean package -DskipTests
   artifacts:
     paths:
@@ -32,7 +32,7 @@ docker_push:
   stage: docker_push
   image: docker:stable
   script:
-    - docker build -t 172.30.38.4:8081/quarkus-helloworld:${project.version} .
+#    - docker build -t 172.30.38.4:8081/quarkus-helloworld:${project.version} .
     - docker push 172.30.38.4:8081/quarkus-helloworld:${project.version}
   tags:
     - master
