@@ -38,6 +38,7 @@
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-container-image-docker</artifactId>
+            <version>1.8.0.Final</version>
         </dependency>
     </dependencies>
 
