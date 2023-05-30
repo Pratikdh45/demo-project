@@ -34,6 +34,7 @@ docker_push:
   variables:
     DOCKER_TLS_CERTDIR: "/certs"
   script:
+    - mvn package -Dquarkus.container-image.build=true
     - docker push 172.30.38.4:8083/repository/docker-private/demo-project/quarkus-helloworld:$CI_COMMIT_REF_NAME
   tags:
     - master
