@@ -14,7 +14,7 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <quarkus.version>2.4.0.Final</quarkus.version>
-        <sonarqube.plugin.version>3.9.0</sonarqube.plugin.version>
+        <sonarqube.plugin.version>7.0</sonarqube.plugin.version>
         <docker.image.prefix>172.30.38.4:8081/docker-private/demo-project/quarkus-helloworld:${project.version}</docker.image.prefix>
     </properties>
 
