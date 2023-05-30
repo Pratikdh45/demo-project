@@ -31,6 +31,8 @@ docker_push:
   image: docker:stable
   services:
     - docker:dind
+  variables:
+    DOCKER_TLS_CERTDIR: "/certs"
   script:
     - docker push 172.30.38.4:8083/repository/docker-private/demo-project/quarkus-helloworld:$CI_COMMIT_REF_NAME
   tags:
