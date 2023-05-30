@@ -94,13 +94,13 @@
                         </configuration>
                     </execution>
                 </executions>
-                    <configuration>
-                        <container-image>
-                            <build>
-                                <enabled>true</enabled>
-                            </build>
-                        </container-image>
-                    </configuration>
+                <configuration>
+                    <container-image>
+                        <build>
+                            <enabled>true</enabled>
+                        </build>
+                    </container-image>
+                </configuration>
             </plugin>
         </plugins>
     </build>
