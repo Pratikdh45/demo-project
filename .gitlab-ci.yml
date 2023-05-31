@@ -11,7 +11,7 @@ variables:
 
 build:
   stage: build
-  image: maven:latest
+  image: maven:3.8.4-openjdk-8-slim
   script:
     - mvn $MAVEN_CLI_OPTS clean package -DskipTests
     - mvn package -Dquarkus.container-image.build=true
@@ -23,7 +23,7 @@ build:
 
 test:
   stage: test
-  image: maven:latest
+  image: maven:3.8.4-openjdk-8-slim
   script:
     - mvn $MAVEN_CLI_OPTS test sonar:sonar -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_LOGIN -Dsonar.password=$SONAR_PASSWORD
   tags:
@@ -40,17 +40,17 @@ docker:
   tags:
     - master
 
-docker_push:
-  stage: docker_push
-  image:
-    name: 172.30.38.4:8083/repository/docker-private/docker:19.03.14
-  before_script:
-    - mkdir -p $HOME/.docker
-    - echo $DOCKER_AUTH_CONFIG > $HOME/.docker/config.json
-    - echo "Preparing to push Docker image..."
-  script:
-    - docker push $DOCKER_IMAGE_PREFIX
-  tags:
-    - master
+# docker_push:
+#   stage: docker_push
+#   image:
+#     name: 172.30.38.4:8083/repository/docker-private/docker:19.03.14
+#   before_script:
+#     - mkdir -p $HOME/.docker
+#     - echo $DOCKER_AUTH_CONFIG > $HOME/.docker/config.json
+#     - echo "Preparing to push Docker image..."
+#   script:
+#     - docker push $DOCKER_IMAGE_PREFIX
+#   tags:
+#     - master
 
 
