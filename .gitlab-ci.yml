@@ -27,7 +27,7 @@ build:
 #   script:
 #     - mvn $MAVEN_CLI_OPTS test sonar:sonar -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_LOGIN -Dsonar.password=$SONAR_PASSWORD
 #   tags:
-    - master
+#    - master
 
 docker:
   stage: docker
@@ -36,6 +36,7 @@ docker:
     - echo "Preparing to create Docker image..."
   script:
     - mvn $MAVEN_CLI_OPTS compile quarkus:build -Dquarkus.container-image.build=true -Dquarkus.container-image.image=$DOCKER_IMAGE_PREFIX:${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
+    - mvn $MAVEN_CLI_OPTS quarkus:build -Dquarkus.container-image.push=true -Dquarkus.container-image.image=$DOCKER_IMAGE_PREFIX:${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
   artifacts:
     paths:
       - target/*.jar
@@ -58,7 +59,7 @@ docker_push:
     - echo "Preparing to push Docker image..."
   script:
     - docker images
-    - docker tag $DOCKER_IMAGE_PREFIX:${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA} $CI_REGISTRY_IMAGE:${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
-    - docker push $CI_REGISTRY_IMAGE:${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
+    - docker tag $DOCKER_IMAGE_PREFIX:${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA} $DOCKER_IMAGE_PREFIX:${CI_COMMIT_REF_SLUG}
+    - docker push $DOCKER_IMAGE_PREFIX:${CI_COMMIT_REF_SLUG}
   tags:
     - master
