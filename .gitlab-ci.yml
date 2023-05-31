@@ -42,9 +42,11 @@ docker:
 
 docker_push:
   stage: docker_push
-  image: docker:stable
+  image:
+    name: docker:stable-dind
+    entrypoint: [""]
   services:
-    - docker:dind
+    - docker:stable-dind
   before_script:
     - echo "Preparing to push Docker image..."
   script:
