@@ -55,8 +55,10 @@
                 <configuration>
                     <container-image>
                         <build>
-                            <registry>${docker.image.prefix}</registry>
+                            <enabled>true</enabled>
                         </build>
+                        <name>${docker.image.prefix}:${project.version}</name>
+                        <format>docker</format>
                     </container-image>
                 </configuration>
             </plugin>
@@ -74,36 +76,6 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
-
-            <!-- Docker-related Plugin for Pushing Image -->
-            <plugin>
-                <groupId>io.quarkus</groupId>
-                <artifactId>quarkus-maven-plugin</artifactId>
-                <version>${quarkus.version}</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>build</goal>
-                        </goals>
-                        <configuration>
-                            <additional-tags>
-                                <tag>${project.version}</tag>
-                            </additional-tags>
-                            <push>
-                                <enabled>true</enabled>
-                                <registry>${docker.image.prefix}</registry>
-                            </push>
-                        </configuration>
-                    </execution>
-                </executions>
-                <configuration>
-                    <container-image>
-                        <build>
-                            <enabled>true</enabled>
-                        </build>
-                    </container-image>
-                </configuration>
             </plugin>
         </plugins>
     </build>
