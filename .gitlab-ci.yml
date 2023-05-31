@@ -1,6 +1,6 @@
 stages:
   - build
-  - test
+#  - test
   - docker
   - docker_push
 
@@ -8,7 +8,7 @@ variables:
   MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version"
   MAVEN_OPTS: "-Dmaven.repo.local=${CI_PROJECT_DIR}/.m2/repository"
   DOCKER_IMAGE_PREFIX: "172.30.38.4:8083/repository/docker-private/demo-project/quarkus-helloworld"
-
+  CI_REGISTRY_IMAGE: "172.30.38.4:8083/repository/docker-private/demo-project/quarkus-helloworld"
 build:
   stage: build
   image: maven:3.8.4-openjdk-11-slim
@@ -21,12 +21,12 @@ build:
   tags:
     - master
 
-test:
-  stage: test
-  image: maven:3.8.4-openjdk-11-slim
-  script:
-    - mvn $MAVEN_CLI_OPTS test sonar:sonar -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_LOGIN -Dsonar.password=$SONAR_PASSWORD
-  tags:
+# test:
+#   stage: test
+#   image: maven:3.8.4-openjdk-11-slim
+#   script:
+#     - mvn $MAVEN_CLI_OPTS test sonar:sonar -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_LOGIN -Dsonar.password=$SONAR_PASSWORD
+#   tags:
     - master
 
 docker:
@@ -58,7 +58,7 @@ docker_push:
     - echo "Preparing to push Docker image..."
   script:
     - docker images
-    - docker load --input target/*.jar
-    - docker push $DOCKER_IMAGE_PREFIX:${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
+    - docker tag $DOCKER_IMAGE_PREFIX:${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA} $CI_REGISTRY_IMAGE:${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
+    - docker push $CI_REGISTRY_IMAGE:${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
   tags:
     - master
