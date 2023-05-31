@@ -7,7 +7,7 @@ stages:
 variables:
   MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version"
   MAVEN_OPTS: "-Dmaven.repo.local=${CI_PROJECT_DIR}/.m2/repository"
-  DOCKER_IMAGE_PREFIX: "172.30.38.4:8081/repository/docker-private/demo-project/quarkus-helloworld"
+  DOCKER_IMAGE_PREFIX: "172.30.38.4:8083/repository/docker-private/demo-project/quarkus-helloworld"
 
 build:
   stage: build
@@ -31,7 +31,19 @@ test:
 
 docker:
   stage: docker
-  image: docker:19.03.14
+  image: maven:3.8.4-openjdk-11-slim
+  before_script:
+    - echo "Preparing to create Docker image..."
+  script:
+    - mvn $MAVEN_CLI_OPTS compile quarkus:build -Dquarkus.container-image.build=true -Dquarkus.container-image.image=$DOCKER_IMAGE_PREFIX
+    - mvn $MAVEN_CLI_OPTS quarkus:build -Dquarkus.container-image.push=true -Dquarkus.container-image.image=$DOCKER_IMAGE_PREFIX
+  tags:
+    - master
+    
+docker_push:
+  stage: docker_push
+  image:
+    name: docker:19.03.14
   variables:
     DOCKER_HOST: tcp://dind.gitlab-runner:2375
   services:
@@ -41,31 +53,9 @@ docker:
   before_script:
     - mkdir -p $HOME/.docker
     - echo $DOCKER_AUTH_CONFIG > $HOME/.docker/config.json
-    - echo "Preparing to create Docker image..."
+    - echo "Preparing to push Docker image..."
   script:
-    - mvn $MAVEN_CLI_OPTS compile quarkus:build -Dquarkus.container-image.build=true -Dquarkus.container-image.image=$DOCKER_IMAGE_PREFIX
-    - mvn $MAVEN_CLI_OPTS quarkus:build -Dquarkus.container-image.push=true -Dquarkus.container-image.image=$DOCKER_IMAGE_PREFIX
     - docker images
     - docker push $DOCKER_IMAGE_PREFIX
   tags:
     - master
-    
-# docker_push:
-#   stage: docker_push
-#   image:
-#     name: docker:19.03.14
-#   variables:
-#     DOCKER_HOST: tcp://dind.gitlab-runner:2375
-#   services:
-#   - name: docker:19.03.14-dind
-#     entrypoint: ["env", "-u", "DOCKER_HOST"]
-#     command: ["dockerd-entrypoint.sh"]
-#   before_script:
-#     - mkdir -p $HOME/.docker
-#     - echo $DOCKER_AUTH_CONFIG > $HOME/.docker/config.json
-#     - echo "Preparing to push Docker image..."
-#   script:
-#     - docker images
-#     - docker push $DOCKER_IMAGE_PREFIX
-#   tags:
-#     - master
