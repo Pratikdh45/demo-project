@@ -35,8 +35,8 @@ docker:
   before_script:
     - echo "Preparing to create Docker image..."
   script:
-    - mvn $MAVEN_CLI_OPTS compile quarkus:build -Dquarkus.container-image.build=true -Dquarkus.container-image.image=$DOCKER_IMAGE_PREFIX
-    - mvn $MAVEN_CLI_OPTS quarkus:build -Dquarkus.container-image.push=true -Dquarkus.container-image.image=$DOCKER_IMAGE_PREFIX
+    - mvn $MAVEN_CLI_OPTS compile quarkus:build -Dquarkus.container-image.build=true -Dquarkus.container-image.image=$DOCKER_IMAGE_PREFIX:${project.version}
+    - mvn $MAVEN_CLI_OPTS quarkus:build -Dquarkus.container-image.push=true -Dquarkus.container-image.image=$DOCKER_IMAGE_PREFIX:${project.version}
   tags:
     - master
     
@@ -56,6 +56,6 @@ docker_push:
     - echo "Preparing to push Docker image..."
   script:
     - docker images
-    - docker push $DOCKER_IMAGE_PREFIX
+    - docker push $DOCKER_IMAGE_PREFIX:${project.version}
   tags:
     - master
