@@ -36,7 +36,9 @@ docker:
     - echo "Preparing to create Docker image..."
   script:
     - mvn $MAVEN_CLI_OPTS compile quarkus:build -Dquarkus.container-image.build=true -Dquarkus.container-image.image=$DOCKER_IMAGE_PREFIX:${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
-    - mvn $MAVEN_CLI_OPTS quarkus:build -Dquarkus.container-image.push=true -Dquarkus.container-image.image=$DOCKER_IMAGE_PREFIX:${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
+  artifacts:
+    paths:
+      - target/*.jar
   tags:
     - master
     
