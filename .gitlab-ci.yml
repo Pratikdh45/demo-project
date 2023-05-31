@@ -23,7 +23,7 @@ build:
 
 test:
   stage: test
-  image: maven:3.8.4-openjdk-8-slim
+  image: maven:3.8.4-openjdk-11-slim
   script:
     - mvn $MAVEN_CLI_OPTS test sonar:sonar -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_LOGIN -Dsonar.password=$SONAR_PASSWORD
   tags:
