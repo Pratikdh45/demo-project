@@ -7,7 +7,7 @@ stages:
 variables:
   MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version"
   MAVEN_OPTS: "-Dmaven.repo.local=${CI_PROJECT_DIR}/.m2/repository"
-  DOCKER_IMAGE_PREFIX: "172.30.38.4:8081/docker-private/demo-project/quarkus-helloworld:${CI_COMMIT_REF_NAME}"
+  DOCKER_IMAGE_PREFIX: "172.30.38.4:8081/repository/docker-private/demo-project/quarkus-helloworld:${CI_COMMIT_REF_NAME}"
 
 build:
   stage: build
@@ -39,18 +39,23 @@ docker:
     - mvn $MAVEN_CLI_OPTS quarkus:build -Dquarkus.container-image.push=true -Dquarkus.container-image.image=$DOCKER_IMAGE_PREFIX
   tags:
     - master
-
-# docker_push:
-#   stage: docker_push
-#   image:
-#     name: 172.30.38.4:8083/repository/docker-private/docker:19.03.14
-#   before_script:
-#     - mkdir -p $HOME/.docker
-#     - echo $DOCKER_AUTH_CONFIG > $HOME/.docker/config.json
-#     - echo "Preparing to push Docker image..."
-#   script:
-#     - docker push $DOCKER_IMAGE_PREFIX
-#   tags:
-#     - master
-
-
+    
+docker_push:
+  stage: docker_push
+  image:
+    name: docker:19.03.14
+  variables:
+    DOCKER_HOST: tcp://dind.gitlab-runner:2375
+  services:
+  - name: docker:19.03.14-dind
+    entrypoint: ["env", "-u", "DOCKER_HOST"]
+    command: ["dockerd-entrypoint.sh"]
+  before_script:
+    - mkdir -p $HOME/.docker
+    - echo $DOCKER_AUTH_CONFIG > $HOME/.docker/config.json
+    - echo "Preparing to push Docker image..."
+  script:
+    - docker images
+    - docker push $DOCKER_IMAGE_PREFIX
+  tags:
+    - master
