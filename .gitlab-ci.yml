@@ -37,25 +37,26 @@ docker:
   script:
     - mvn $MAVEN_CLI_OPTS compile quarkus:build -Dquarkus.container-image.build=true -Dquarkus.container-image.image=$DOCKER_IMAGE_PREFIX:${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
     - mvn $MAVEN_CLI_OPTS quarkus:build -Dquarkus.container-image.push=true -Dquarkus.container-image.image=$DOCKER_IMAGE_PREFIX:${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
+    - docker images
   tags:
     - master
     
-docker_push:
-  stage: docker_push
-  image:
-    name: docker:19.03.14
-  variables:
-    DOCKER_HOST: tcp://dind.gitlab-runner:2375
-  services:
-  - name: docker:19.03.14-dind
-    entrypoint: ["env", "-u", "DOCKER_HOST"]
-    command: ["dockerd-entrypoint.sh"]
-  before_script:
-    - mkdir -p $HOME/.docker
-    - echo $DOCKER_AUTH_CONFIG > $HOME/.docker/config.json
-    - echo "Preparing to push Docker image..."
-  script:
-    - docker images
-    - docker push $DOCKER_IMAGE_PREFIX:${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
-  tags:
-    - master
+# docker_push:
+#   stage: docker_push
+#   image:
+#     name: docker:19.03.14
+#   variables:
+#     DOCKER_HOST: tcp://dind.gitlab-runner:2375
+#   services:
+#   - name: docker:19.03.14-dind
+#     entrypoint: ["env", "-u", "DOCKER_HOST"]
+#     command: ["dockerd-entrypoint.sh"]
+#   before_script:
+#     - mkdir -p $HOME/.docker
+#     - echo $DOCKER_AUTH_CONFIG > $HOME/.docker/config.json
+#     - echo "Preparing to push Docker image..."
+#   script:
+#     - docker images
+#     - docker push $DOCKER_IMAGE_PREFIX:${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
+#   tags:
+#     - master
