@@ -43,11 +43,10 @@ docker:
 docker_push:
   stage: docker_push
   image:
-    name: docker:stable-dind
-    entrypoint: [""]
-  services:
-    - docker:stable-dind
+    name: 172.30.38.4:8083/repository/docker-private/docker:19.03.14
   before_script:
+    - mkdir -p $HOME/.docker
+    - echo $DOCKER_AUTH_CONFIG > $HOME/.docker/config.json
     - echo "Preparing to push Docker image..."
   script:
     - docker push $DOCKER_IMAGE_PREFIX
