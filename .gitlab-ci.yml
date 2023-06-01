@@ -14,7 +14,6 @@ build:
   image: maven:3.8.4-openjdk-11-slim
   script:
     - mvn $MAVEN_CLI_OPTS clean package -DskipTests
-    - mvn package -Dquarkus.container-image.push=true
   artifacts:
     paths:
       - target/*.jar
