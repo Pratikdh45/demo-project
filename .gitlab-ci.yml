@@ -19,7 +19,7 @@ variables:
 docker_push:
   stage: docker_push
   image:
-    name: docker:19.03.14
+    name: pratik1945/openjdk11-docker:1.0.0
   variables:
     DOCKER_HOST: tcp://dind.gitlab-runner:2375
   services:
