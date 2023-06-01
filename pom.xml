@@ -6,6 +6,7 @@
   <artifactId>quarkus-helloworld</artifactId>
   <version>1.0.0-SNAPSHOT</version>
   <properties>
+    <docker.image.prefix>172.30.38.4:8083/repository/docker-private/demo-project/quarkus-helloworld</docker.image.prefix>
     <maven.compiler.source>11</maven.compiler.source>
     <maven.compiler.target>11</maven.compiler.target>
     <quarkus.version>3.1.0.Final</quarkus.version>
@@ -34,6 +35,29 @@
   </dependencies>
   <build>
     <plugins>
+      <plugin>
+        <groupId>io.quarkus</groupId>
+        <artifactId>quarkus-maven-plugin</artifactId>
+        <version>${quarkus.version}</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>build</goal>
+              <goal>generate-code</goal>
+              <goal>generate-code-tests</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <container-image>
+            <build>
+              <enabled>true</enabled>
+            </build>
+            <name>${docker.image.prefix}</name>
+            <format>docker</format>
+          </container-image>
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>org.sonarsource.scanner.maven</groupId>
         <artifactId>sonar-maven-plugin</artifactId>
