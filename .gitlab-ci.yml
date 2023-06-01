@@ -19,7 +19,7 @@ variables:
 docker_push:
   stage: docker_push
   image:
-    name: 172.30.38.4:8083/repository/docker-private/docker:19.03.14
+    name: docker:19.03.14
   variables:
     DOCKER_HOST: tcp://dind.gitlab-runner:2375
   services:
