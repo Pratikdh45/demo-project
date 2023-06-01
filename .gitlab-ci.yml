@@ -1,7 +1,5 @@
 stages:
-  - build
   - test
-  - docker
   - docker_push
 
 variables:
@@ -9,16 +7,6 @@ variables:
   MAVEN_OPTS: "-Dmaven.repo.local=${CI_PROJECT_DIR}/.m2/repository"
   DOCKER_IMAGE_PREFIX: "repository/docker-private/demo-project/quarkus-helloworld"
   CI_REGISTRY_IMAGE: "172.30.38.4:8083/repository/docker-private/demo-project/quarkus-helloworld"
-build:
-  stage: build
-  image: maven:3.8.4-openjdk-11-slim
-  script:
-    - mvn $MAVEN_CLI_OPTS clean package -DskipTests
-  artifacts:
-    paths:
-      - target/*.jar
-  tags:
-    - master
 
 test:
   stage: test
@@ -27,22 +15,11 @@ test:
     - mvn $MAVEN_CLI_OPTS test sonar:sonar -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_LOGIN -Dsonar.password=$SONAR_PASSWORD
   tags:
    - master
-
-docker:
-  stage: docker
-  image: maven:3.8.4-openjdk-11-slim
-  before_script:
-    - echo "Preparing to create Docker image..."
-  script:
-    - mvn clean package
-    - mvn package -Dquarkus.container-image.push=true
-  tags:
-    - master
-    
+   
 docker_push:
   stage: docker_push
   image:
-    name: docker:19.03.14
+    name: maven:3.8.4-openjdk-11-slim
   variables:
     DOCKER_HOST: tcp://dind.gitlab-runner:2375
   services:
@@ -54,8 +31,12 @@ docker_push:
     - echo $DOCKER_AUTH_CONFIG > $HOME/.docker/config.json
     - echo "Preparing to push Docker image..."
   script:
+    - mvn $MAVEN_CLI_OPTS clean package -DskipTests
     - docker images
     - docker tag $DOCKER_IMAGE_PREFIX $CI_REGISTRY_IMAGE:${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
     - docker push $CI_REGISTRY_IMAGE:${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
+  artifacts:
+    paths:
+      - target/*.jar
   tags:
     - master
