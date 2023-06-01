@@ -11,9 +11,10 @@ variables:
   CI_REGISTRY_IMAGE: "172.30.38.4:8083/repository/docker-private/demo-project/quarkus-helloworld"
 build:
   stage: build
+  image: maven:3.8.4-openjdk-11-slim
   script:
     - mvn $MAVEN_CLI_OPTS clean package -DskipTests
-    - mvn package -Dquarkus.container-image.build=true
+    - mvn package -Dquarkus.container-image.push=true
   artifacts:
     paths:
       - target/*.jar
@@ -22,6 +23,7 @@ build:
 
 test:
   stage: test
+  image: maven:3.8.4-openjdk-11-slim
   script:
     - mvn $MAVEN_CLI_OPTS test sonar:sonar -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_LOGIN -Dsonar.password=$SONAR_PASSWORD
   tags:
@@ -29,10 +31,12 @@ test:
 
 docker:
   stage: docker
+  image: maven:3.8.4-openjdk-11-slim
   before_script:
     - echo "Preparing to create Docker image..."
   script:
     - mvn clean package
+    - mvn package -Dquarkus.container-image.push=true
   tags:
     - master
     
