@@ -25,12 +25,12 @@ docker_push:
   stage: docker_push
   image:
     name: pratik1945/openjdk11-docker:1.0.0
-  # variables:
-  #   DOCKER_HOST: tcp://dind.gitlab-runner:2375
-  # services:
-  # - name: docker:19.03.14-dind
-  #   entrypoint: ["env", "-u", "DOCKER_HOST"]
-  #   command: ["dockerd-entrypoint.sh"]
+  variables:
+    DOCKER_HOST: tcp://dind.gitlab-runner:2375
+  services:
+  - name: docker:19.03.14-dind
+    entrypoint: ["env", "-u", "DOCKER_HOST"]
+    command: ["dockerd-entrypoint.sh"]
   before_script:
     - mkdir -p $HOME/.docker
     - echo $DOCKER_AUTH_CONFIG > $HOME/.docker/config.json
@@ -45,4 +45,4 @@ docker_push:
     paths:
       - target/*.jar
   tags:
-    - shared-master
+    - master
