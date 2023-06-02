@@ -24,7 +24,7 @@ variables:
 docker_push:
   stage: docker_push
   image:
-    name: maven:3.8.4-openjdk-11-slim
+    name: 172.30.38.4:8082/repository/docker-private/demo-project/openjdk11-docker:1.0.0
   variables:
     DOCKER_HOST: tcp://dind.gitlab-runner:2375
   services:
