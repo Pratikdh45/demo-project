@@ -1,7 +1,7 @@
 stages:
   - build
 #  - test
-  - docker_build
+#  - docker_build
   - docker_push
 
 variables:
@@ -12,7 +12,7 @@ variables:
 
 build:
   stage: build
-  image: maven:3.8.4-openjdk-11-slim
+  image: pratik1945/openjdk11-docker:3.0.0testing
   script:
     - mvn clean package -DskipTests -Dquarkus.container-image.build=true
   artifacts:
