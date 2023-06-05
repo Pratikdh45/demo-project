@@ -37,7 +37,7 @@ build:
   variables:
     DOCKER_HOST: tcp://dind.gitlab-runner:2375
   services:
-  - name: docker:19.03.14-dind
+  - name: registry.hub.docker.com/pratik1945/openjdk11-docker:3.0.0testing
     entrypoint: ["env", "-u", "DOCKER_HOST"]
     command: ["dockerd-entrypoint.sh"]
   before_script:
