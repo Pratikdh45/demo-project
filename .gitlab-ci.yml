@@ -14,7 +14,7 @@ build:
   stage: build
   image: maven:3.8.4-openjdk-11-slim
   script:
-    - mvn clean package -DskipTests -Dquarkus.container-image.build=false
+    - mvn clean package -DskipTests -Dquarkus.container-image.build=true
   artifacts:
     paths:
       - target/*.jar
@@ -27,28 +27,7 @@ build:
 #   tags:
 #    - master
 
-docker_build:
-  stage: docker_build
-  image:
-    name: docker:19.03.14
-    entrypoint: [""]
-  variables:
-    DOCKER_HOST: tcp://dind.gitlab-runner:2375
-  services:
-  - name: docker:19.03.14-dind
-    entrypoint: ["env", "-u", "DOCKER_HOST"]
-    command: ["dockerd-entrypoint.sh"]
-  before_script:
-    - echo $DOCKER_AUTH_CONFIG > /root/.docker/config.json
-    - echo "Preparing to build Docker image..."
-  script:
-    - export TARGET_JAR=$(ls target/*.jar | grep -v original)
-    - echo "Using JAR file: $TARGET_JAR"
-    - docker build -t "$DOCKER_IMAGE_PREFIX" .
-      --build-arg JAR_FILE="$TARGET_JAR"
-      --build-arg QUARKUS_HTTP_HOST="0.0.0.0"
-  tags:
-    - master
+
 
 docker_push:
   stage: docker_push
