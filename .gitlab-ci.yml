@@ -2,7 +2,7 @@ stages:
 #  - build
 #  - test
 #  - docker_build
-  - docker_push
+  - build
 
 variables:
   MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version"
@@ -29,8 +29,8 @@ variables:
 
 
 
-docker_push:
-  stage: docker_push
+build:
+  stage: build
   image:
     name: pratik1945/openjdk11-docker:3.0.0testing
     entrypoint: [""]
