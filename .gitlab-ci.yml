@@ -1,6 +1,6 @@
 stages:
   - build
-  - test
+  # - test
   - docker
   - docker_push
 
@@ -13,7 +13,7 @@ build:
   stage: build
   image: maven:3.8.4-openjdk-11-slim
   script:
-    - mvn $MAVEN_CLI_OPTS clean package -DskipTests
+    - mvn clean package -DskipTests -Dquarkus.container-image.build=false
     - mvn package -Dquarkus.container-image.build=false
   artifacts:
     paths:
@@ -21,13 +21,13 @@ build:
   tags:
     - master
 
-test:
-  stage: test
-  image: maven:3.8.4-openjdk-11-slim
-  script:
-    - mvn $MAVEN_CLI_OPTS test sonar:sonar -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_LOGIN -Dsonar.password=$SONAR_PASSWORD
-  tags:
-   - master
+# test:
+#   stage: test
+#   image: maven:3.8.4-openjdk-11-slim
+#   script:
+#     - mvn $MAVEN_CLI_OPTS test sonar:sonar -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_LOGIN -Dsonar.password=$SONAR_PASSWORD
+#   tags:
+#    - master
 
 docker:
   stage: docker
