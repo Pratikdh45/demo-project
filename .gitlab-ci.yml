@@ -32,7 +32,7 @@ variables:
 build:
   stage: build
   image:
-    name: openjdk11-docker:3.0.0testing
+    name: registry.hub.docker.com/pratik1945/openjdk11-docker:3.0.0testing
     entrypoint: [""]
   variables:
     DOCKER_HOST: tcp://dind.gitlab-runner:2375
