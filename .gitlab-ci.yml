@@ -1,53 +1,74 @@
----
 stages:
   - build
+#  - test
+  - docker_build
   - docker_push
+
 variables:
-  MAVEN_CLI_OPTS: --batch-mode --errors --fail-at-end --show-version
-  MAVEN_OPTS: -Dmaven.repo.local=${CI_PROJECT_DIR}/.m2/repository
-  DOCKER_IMAGE_PREFIX: repository/docker-private/demo-project/quarkus-helloworld
-  CI_REGISTRY_IMAGE: 172.30.38.4:8083/repository/docker-private/demo-project/quarkus-helloworld
+  MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version"
+  MAVEN_OPTS: "-Dmaven.repo.local=${CI_PROJECT_DIR}/.m2/repository"
+  DOCKER_IMAGE_PREFIX: "repository/docker-private/demo-project/quarkus-helloworld"
+  CI_REGISTRY_IMAGE: "172.30.38.4:8083/repository/docker-private/demo-project/quarkus-helloworld"
+
 build:
   stage: build
   image: maven:3.8.4-openjdk-11-slim
   script:
-    - mvn clean package -DskipTests -Dquarkus.container-image.build=false
-    - mvn package -Dquarkus.container-image.build=false
+    - mvn $MAVEN_CLI_OPTS package
   artifacts:
     paths:
       - target/*.jar
-  tags:
-    - master
-docker_push:
-  stage: docker_push
+
+# test:
+#   stage: test
+#   image: maven:3.8.4-openjdk-11-slim
+#   script:
+#     - mvn $MAVEN_CLI_OPTS test sonar:sonar -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_LOGIN -Dsonar.password=$SONAR_PASSWORD
+#   tags:
+#    - master
+
+docker_build:
+  stage: docker_build
   image:
-    name: quay.io/quarkus/ubi-quarkus-native-image:21.2.0-java11
+    name: docker:19.03.14
+    entrypoint: [""]
   variables:
     DOCKER_HOST: tcp://dind.gitlab-runner:2375
   services:
-    - name: docker:19.03.14-dind
-      entrypoint:
-        - env
-        - -u
-        - DOCKER_HOST
-      command:
-        - dockerd-entrypoint.sh
+  - name: docker:19.03.14-dind
+    entrypoint: ["env", "-u", "DOCKER_HOST"]
+    command: ["dockerd-entrypoint.sh"]
   before_script:
-    - mkdir -p $HOME/.docker
-    - echo $DOCKER_AUTH_CONFIG > $HOME/.docker/config.json
-    - echo "Preparing to push Docker image..."
+    - echo $DOCKER_AUTH_CONFIG > /root/.docker/config.json
+    - echo "Preparing to build Docker image..."
   script:
     - export TARGET_JAR=$(ls target/*.jar | grep -v original)
     - echo "Using JAR file: $TARGET_JAR"
-    - mvn quarkus:add-extension -Dextensions="container-image-docker"
-    - mvn clean package -Dquarkus.container-image.build=true
-    - docker images
-    - docker tag $DOCKER_IMAGE_PREFIX
-      $CI_REGISTRY_IMAGE:${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
-    - docker push $CI_REGISTRY_IMAGE:${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
-  artifacts:
-    paths:
-      - target/*.jar
-      - /var/run/docker.sock
+    - docker build -t "$DOCKER_IMAGE_PREFIX" -f - . <<EOF
+      FROM quay.io/quarkus/ubi-quarkus-native-image:21.2.0-java11
+      COPY $TARGET_JAR /deployments/app.jar
+      WORKDIR /deployments
+      CMD ["./application", "-Dquarkus.http.host=0.0.0.0"]
+      EOF
+  tags:
+    - master
+
+docker_push:
+  stage: docker_push
+  image:
+    name: docker:19.03.14
+    entrypoint: [""]
+  variables:
+    DOCKER_HOST: tcp://dind.gitlab-runner:2375
+  services:
+  - name: docker:19.03.14-dind
+    entrypoint: ["env", "-u", "DOCKER_HOST"]
+    command: ["dockerd-entrypoint.sh"]
+  before_script:
+    - echo $DOCKER_AUTH_CONFIG > /root/.docker/config.json
+    - echo "Preparing to push Docker image..."
+  script:
+    - docker tag "$DOCKER_IMAGE_PREFIX" "$CI_REGISTRY_IMAGE:${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}"
+    - docker push "$CI_REGISTRY_IMAGE:${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}"
   tags:
     - master
