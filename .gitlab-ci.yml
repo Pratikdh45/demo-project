@@ -14,7 +14,7 @@ build:
   stage: build
   image: maven:3.8.4-openjdk-11-slim
   script:
-    - mvn $MAVEN_CLI_OPTS package
+    - mvn clean package -DskipTests -Dquarkus.container-image.build=false
   artifacts:
     paths:
       - target/*.jar
@@ -44,12 +44,9 @@ docker_build:
   script:
     - export TARGET_JAR=$(ls target/*.jar | grep -v original)
     - echo "Using JAR file: $TARGET_JAR"
-    - docker build -t "$DOCKER_IMAGE_PREFIX" -f - . <<EOF
-      FROM quay.io/quarkus/ubi-quarkus-native-image:21.2.0-java11
-      COPY $TARGET_JAR /deployments/app.jar
-      WORKDIR /deployments
-      CMD ["./application", "-Dquarkus.http.host=0.0.0.0"]
-      EOF
+    - docker build -t "$DOCKER_IMAGE_PREFIX" .
+      --build-arg JAR_FILE="$TARGET_JAR"
+      --build-arg QUARKUS_HTTP_HOST="0.0.0.0"
   tags:
     - master
 
