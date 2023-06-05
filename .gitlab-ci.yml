@@ -18,6 +18,8 @@ build:
   artifacts:
     paths:
       - target/*.jar
+  tags:
+    - staging
 
 # test:
 #   stage: test
@@ -47,4 +49,4 @@ docker_build:
     - docker tag "$DOCKER_IMAGE_PREFIX" "$CI_REGISTRY_IMAGE:${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}"
     - docker push "$CI_REGISTRY_IMAGE:${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}"
   tags:
-    - master
+    - staging
