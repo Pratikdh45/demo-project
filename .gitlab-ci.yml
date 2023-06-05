@@ -41,8 +41,9 @@ docker_build:
     entrypoint: ["env", "-u", "DOCKER_HOST"]
     command: ["dockerd-entrypoint.sh"]
   before_script:
+    - mkdir -p $HOME/.docker
     - echo $DOCKER_AUTH_CONFIG > $HOME/.docker/config.json
-    - echo "Preparing to push Docker image..."
+    - echo "Preparing for Docker image..."
   script:
     - docker build -t $DOCKER_IMAGE_PREFIX .
     - docker images
