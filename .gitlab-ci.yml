@@ -36,7 +36,7 @@ docker_push:
     - echo $DOCKER_AUTH_CONFIG > $HOME/.docker/config.json
     - echo "Preparing to push Docker image..."
   script:
-    - mvn clean package -DskipTests -Dquarkus.container-image.build=true
+    - mvn clean package
     # - mvn package -Dquarkus.container-image.build=true
     - docker images
     - docker tag $DOCKER_IMAGE_PREFIX $CI_REGISTRY_IMAGE:${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
