@@ -10,14 +10,13 @@ variables:
   DOCKER_IMAGE_PREFIX: "repository/docker-private/demo-project/quarkus-helloworld"
   CI_REGISTRY_IMAGE: "172.30.38.4:8083/repository/docker-private/demo-project/quarkus-helloworld"
 
-# build:
-#   stage: build
-#   image: pratik1945/openjdk11-docker:3.0.0testing
-#   script:
-#     - mvn clean package -DskipTests -Dquarkus.container-image.build=true
-#   artifacts:
-#     paths:
-#       - target/*.jar
+build:
+  stage: build
+  script:
+    - mvn clean package -DskipTests -Dquarkus.container-image.build=true
+  artifacts:
+    paths:
+      - target/*.jar
 
 # test:
 #   stage: test
@@ -29,24 +28,24 @@ variables:
 
 
 
-build:
-  stage: build
-  image:
-    name: registry.hub.docker.com/pratik1945/openjdk11-docker:3.0.0testing
-    entrypoint: [""]
-  variables:
-    DOCKER_HOST: tcp://dind.gitlab-runner:2375
-  services:
-  - name: registry.hub.docker.com/pratik1945/openjdk11-docker:3.0.0testing
-    entrypoint: ["env", "-u", "DOCKER_HOST"]
-    command: ["dockerd-entrypoint.sh"]
-  before_script:
-    - echo $DOCKER_AUTH_CONFIG > /root/.docker/config.json
-    - echo "Preparing to push Docker image..."
-  script:
-    - mvn clean package -DskipTests -Dquarkus.container-image.build=true
-    - docker images
-    - docker tag "$DOCKER_IMAGE_PREFIX" "$CI_REGISTRY_IMAGE:${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}"
-    - docker push "$CI_REGISTRY_IMAGE:${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}"
-  tags:
-    - master
+# build:
+#   stage: build
+#   image:
+#     name: registry.hub.docker.com/pratik1945/openjdk11-docker:3.0.0testing
+#     entrypoint: [""]
+#   variables:
+#     DOCKER_HOST: tcp://dind.gitlab-runner:2375
+#   services:
+#   - name: registry.hub.docker.com/pratik1945/openjdk11-docker:3.0.0testing
+#     entrypoint: ["env", "-u", "DOCKER_HOST"]
+#     command: ["dockerd-entrypoint.sh"]
+#   before_script:
+#     - echo $DOCKER_AUTH_CONFIG > /root/.docker/config.json
+#     - echo "Preparing to push Docker image..."
+#   script:
+#     - mvn clean package -DskipTests -Dquarkus.container-image.build=true
+#     - docker images
+#     - docker tag "$DOCKER_IMAGE_PREFIX" "$CI_REGISTRY_IMAGE:${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}"
+#     - docker push "$CI_REGISTRY_IMAGE:${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}"
+#   tags:
+#     - master
