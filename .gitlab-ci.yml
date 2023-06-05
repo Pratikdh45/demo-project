@@ -31,6 +31,7 @@ docker_push:
     DOCKER_TLS_CERTDIR: ""
   services:
   - name: docker:19.03.14-dind
+    command: ["--insecure-registry", "registry.gitlab.com"]
   before_script:
     - mkdir -p $HOME/.docker
     - echo $DOCKER_AUTH_CONFIG > $HOME/.docker/config.json
