@@ -1,7 +1,7 @@
 stages:
   - build
   # - test
-  - docker
+#  - docker
   - docker_push
 
 variables:
@@ -29,19 +29,19 @@ build:
 #   tags:
 #    - master
 
-docker:
-  stage: docker
-  image: maven:3.8.4-openjdk-11-slim
-  before_script:
-    - echo "Preparing to create Docker image..."
-  script:
-    - mvn clean package
-  artifacts:
-    paths:
-      - target/*.jar
-      - /var/run/docker.sock
-  tags:
-    - master
+# docker:
+#   stage: docker
+#   image: maven:3.8.4-openjdk-11-slim
+#   before_script:
+#     - echo "Preparing to create Docker image..."
+#   script:
+#     - docker build -t $DOCKER_IMAGE_PREFIX
+#   artifacts:
+#     paths:
+#       - target/*.jar
+#       - /var/run/docker.sock
+#   tags:
+#     - master
     
 docker_push:
   stage: docker_push
@@ -58,12 +58,13 @@ docker_push:
     - echo $DOCKER_AUTH_CONFIG > $HOME/.docker/config.json
     - echo "Preparing to push Docker image..."
   script:
-    - docker load -i target/docker_image.tar
+    - docker build -t $DOCKER_IMAGE_PREFIX .
     - docker images
     - docker tag $DOCKER_IMAGE_PREFIX $CI_REGISTRY_IMAGE:${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
     - docker push $CI_REGISTRY_IMAGE:${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
-  rules:
-    - exists:
-        - target/docker_image.tar
+  artifacts:
+    paths:
+      - target/*.jar
+      - /var/run/docker.sock
   tags:
     - master
