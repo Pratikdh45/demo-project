@@ -1,14 +1,12 @@
+---
 stages:
   - build
-  # - test
-#  - docker
   - docker_push
-
 variables:
-  MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version"
-  MAVEN_OPTS: "-Dmaven.repo.local=${CI_PROJECT_DIR}/.m2/repository"
-  DOCKER_IMAGE_PREFIX: "repository/docker-private/demo-project/quarkus-helloworld"
-  CI_REGISTRY_IMAGE: "172.30.38.4:8083/repository/docker-private/demo-project/quarkus-helloworld"
+  MAVEN_CLI_OPTS: --batch-mode --errors --fail-at-end --show-version
+  MAVEN_OPTS: -Dmaven.repo.local=${CI_PROJECT_DIR}/.m2/repository
+  DOCKER_IMAGE_PREFIX: repository/docker-private/demo-project/quarkus-helloworld
+  CI_REGISTRY_IMAGE: 172.30.38.4:8083/repository/docker-private/demo-project/quarkus-helloworld
 build:
   stage: build
   image: maven:3.8.4-openjdk-11-slim
@@ -20,29 +18,6 @@ build:
       - target/*.jar
   tags:
     - master
-
-# test:
-#   stage: test
-#   image: maven:3.8.4-openjdk-11-slim
-#   script:
-#     - mvn $MAVEN_CLI_OPTS test sonar:sonar -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_LOGIN -Dsonar.password=$SONAR_PASSWORD
-#   tags:
-#    - master
-
-# docker:
-#   stage: docker
-#   image: maven:3.8.4-openjdk-11-slim
-#   before_script:
-#     - echo "Preparing to create Docker image..."
-#   script:
-#     - docker build -t $DOCKER_IMAGE_PREFIX
-#   artifacts:
-#     paths:
-#       - target/*.jar
-#       - /var/run/docker.sock
-#   tags:
-#     - master
-    
 docker_push:
   stage: docker_push
   image:
@@ -50,9 +25,13 @@ docker_push:
   variables:
     DOCKER_HOST: tcp://dind.gitlab-runner:2375
   services:
-  - name: docker:19.03.14-dind
-    entrypoint: ["env", "-u", "DOCKER_HOST"]
-    command: ["dockerd-entrypoint.sh"]
+    - name: docker:19.03.14-dind
+      entrypoint:
+        - env
+        - -u
+        - DOCKER_HOST
+      command:
+        - dockerd-entrypoint.sh
   before_script:
     - mkdir -p $HOME/.docker
     - echo $DOCKER_AUTH_CONFIG > $HOME/.docker/config.json
@@ -63,7 +42,8 @@ docker_push:
     - mvn quarkus:add-extension -Dextensions="container-image-docker"
     - mvn clean package -Dquarkus.container-image.build=true
     - docker images
-    - docker tag $DOCKER_IMAGE_PREFIX $CI_REGISTRY_IMAGE:${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
+    - docker tag $DOCKER_IMAGE_PREFIX
+      $CI_REGISTRY_IMAGE:${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
     - docker push $CI_REGISTRY_IMAGE:${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
   artifacts:
     paths:
