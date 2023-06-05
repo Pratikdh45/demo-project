@@ -46,7 +46,7 @@ build:
 docker_push:
   stage: docker_push
   image:
-    name: docker:19.03.14
+    name: quay.io/quarkus/ubi-quarkus-native-image:21.2.0-java11
   variables:
     DOCKER_HOST: tcp://dind.gitlab-runner:2375
   services:
@@ -58,7 +58,10 @@ docker_push:
     - echo $DOCKER_AUTH_CONFIG > $HOME/.docker/config.json
     - echo "Preparing to push Docker image..."
   script:
-    - docker build -t $DOCKER_IMAGE_PREFIX .
+    - export TARGET_JAR=$(ls target/*.jar | grep -v original)
+    - echo "Using JAR file: $TARGET_JAR"
+    - mvn quarkus:add-extension -Dextensions="container-image-docker"
+    - mvn clean package -Dquarkus.container-image.build=true
     - docker images
     - docker tag $DOCKER_IMAGE_PREFIX $CI_REGISTRY_IMAGE:${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
     - docker push $CI_REGISTRY_IMAGE:${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}
