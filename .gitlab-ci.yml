@@ -52,17 +52,15 @@ docker_build:
     - docker images
     - docker tag "$DOCKER_IMAGE_PREFIX" "$CI_REGISTRY_IMAGE:${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}"
     - docker push "$CI_REGISTRY_IMAGE:${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}"
-  artifacts:
-    paths:
-    - mkdir -p $HOME/.docker
-    - echo $DOCKER_AUTH_CONFIG > $HOME/.docker/config.json
-    - echo $HOME/.docker/config.json
   tags:
     - master
 
 deploy:
   stage: deploy
   image: $OC_IMAGE_NAME_AND_TAG
+  variables:
+    DOCKER_TLS_CERTDIR: "/certs"
+    DOCKER_OPTS: "--insecure-registry=$NEXUS_URL"
   script:
     - echo "Deploying to OpenShift..."
     - |
