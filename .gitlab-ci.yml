@@ -63,6 +63,6 @@ deploy:
     - |
       oc login https://api.openshift.mobicom.mn:6443 --token=$OCP_TOKEN_DEMO --insecure-skip-tls-verify=true
       oc project $OPENSHIFT_PROJECT
-      oc apply -f k8s/deployment.yaml
+      oc apply -f k8s/deployment.yml
   tags:
     - master
