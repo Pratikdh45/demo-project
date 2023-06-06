@@ -10,7 +10,7 @@ variables:
   DOCKER_IMAGE_PREFIX: "repository/docker-private/demo-project/quarkus-helloworld"
   CI_REGISTRY_IMAGE: "172.30.38.4:8083/repository/docker-private/demo-project/quarkus-helloworld"
   OC_IMAGE_NAME_AND_TAG: "repository/docker-private/alpine:oc-4.10.4"
-  OPENSHIFT_PROJECT: "quarkus-helloworld"
+  OPENSHIFT_PROJECT: "quarkus-demo-project"
 
 # build:
 #   stage: build
@@ -61,10 +61,8 @@ deploy:
   script:
     - echo "Deploying to OpenShift..."
     - |
-      oc login https://api.openshift.mobicom.mn:6443 --token=$OCP_TOKEN_STG --insecure-skip-tls-verify=true
+      oc login https://api.openshift.mobicom.mn:6443 --token=$OCP_TOKEN_DEMO --insecure-skip-tls-verify=true
       oc project $OPENSHIFT_PROJECT
       oc apply -f k8s/deployment.yaml
   tags:
     - master
-  when: manual
-  allow_failure: true
