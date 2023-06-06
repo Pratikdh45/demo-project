@@ -52,21 +52,16 @@ docker_build:
     - docker images
     - docker tag "$DOCKER_IMAGE_PREFIX" "$CI_REGISTRY_IMAGE:${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}"
     - docker push "$CI_REGISTRY_IMAGE:${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}"
+  artifacts:
+    paths:
+    - echo $DOCKER_AUTH_CONFIG > $HOME/.docker/config.json
+    - echo $HOME/.docker/config.json
   tags:
     - master
 
 deploy:
   stage: deploy
-  image: docker:19.03.14
-  variables:
-    DOCKER_HOST: tcp://dind.gitlab-runner:2375
-  services:
-  - name: docker:19.03.14-dind
-    entrypoint: ["env", "-u", "DOCKER_HOST"]
-    command: ["dockerd-entrypoint.sh"]
-  before_script:
-    - mkdir -p $HOME/.docker
-    - echo $DOCKER_AUTH_CONFIG > $HOME/.docker/config.json
+  image: $OC_IMAGE_NAME_AND_TAG
   script:
     - echo "Deploying to OpenShift..."
     - |
