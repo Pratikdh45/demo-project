@@ -2,13 +2,14 @@ stages:
   - build
 #  - test
   - docker_build
-#  - build
+  - manual_approval
 
 variables:
   MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version"
   MAVEN_OPTS: "-Dmaven.repo.local=${CI_PROJECT_DIR}/.m2/repository"
   DOCKER_IMAGE_PREFIX: "repository/docker-private/demo-project/quarkus-helloworld"
   CI_REGISTRY_IMAGE: "172.30.38.4:8083/repository/docker-private/demo-project/quarkus-helloworld"
+  OC_IMAGE_NAME_AND_TAG: "172.30.38.4:8083/repository/docker-private/alpine:oc-4.10.4"
 
 build:
   stage: build
@@ -49,5 +50,22 @@ docker_build:
     - docker images
     - docker tag "$DOCKER_IMAGE_PREFIX" "$CI_REGISTRY_IMAGE:${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}"
     - docker push "$CI_REGISTRY_IMAGE:${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}"
+  tags:
+    - master
+
+manual_approval:
+  stage: manual_approval
+  when: manual
+  allow_failure: true
+
+deploy:
+  stage: deploy
+  image: $OC_IMAGE_NAME_AND_TAG
+  script:
+    - echo "Deploying to OpenShift..."
+    - |
+      oc login https://api.openshift.mobicom.mn:6443 --token=$OCP_TOKEN_STG --insecure-skip-tls-verify=true
+      oc project $OPENSHIFT_PROJECT
+      oc apply -f k8s/deployment.yaml
   tags:
     - master
