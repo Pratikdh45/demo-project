@@ -1,5 +1,5 @@
 stages:
-  - build
+#  - build
 #  - test
   - docker_build
   - deploy
@@ -12,16 +12,16 @@ variables:
   OC_IMAGE_NAME_AND_TAG: "172.30.38.4:8083/repository/docker-private/alpine:oc-4.10.4"
   OPENSHIFT_PROJECT: "quarkus-helloworld"
 
-build:
-  stage: build
-  image: maven:3.8.4-openjdk-11-slim
-  script:
-    - mvn clean package -DskipTests -Dquarkus.container-image.build=false
-  artifacts:
-    paths:
-      - target/*.jar
-  tags:
-    - master
+# build:
+#   stage: build
+#   image: maven:3.8.4-openjdk-11-slim
+#   script:
+#     - mvn clean package -DskipTests -Dquarkus.container-image.build=false
+#   artifacts:
+#     paths:
+#       - target/*.jar
+#   tags:
+#     - master
 
 # test:
 #   stage: test
@@ -54,6 +54,7 @@ docker_build:
     - docker push "$CI_REGISTRY_IMAGE:${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}"
   artifacts:
     paths:
+    - mkdir -p $HOME/.docker
     - echo $DOCKER_AUTH_CONFIG > $HOME/.docker/config.json
     - echo $HOME/.docker/config.json
   tags:
