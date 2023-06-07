@@ -39,7 +39,6 @@ build:
 #   tags:
 #     - master
 
-
 docker_build:
   stage: docker_build
   image:
