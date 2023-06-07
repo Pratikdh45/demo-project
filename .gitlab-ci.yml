@@ -1,6 +1,6 @@
 stages:
-  - build
-  - test
+#  - build
+#  - test
   - docker_build
   - deploy
 
@@ -16,24 +16,24 @@ variables:
   OPENSHIFT_PROJECT_STAGING: "quarkus-demo-staging-project"
   OPENSHIFT_PROJECT_PROD: "quarkus-demo-prod-project"
 
-build:
-  stage: build
-  image: maven:3.8.4-openjdk-11-slim
-  script:
-   - mvn clean package -DskipTests -Dquarkus.container-image.build=false
-  artifacts:
-    paths:
-      - target/*.jar
-  tags:
-    - master
+# build:
+#   stage: build
+#   image: maven:3.8.4-openjdk-11-slim
+#   script:
+#    - mvn clean package -DskipTests -Dquarkus.container-image.build=false
+#   artifacts:
+#     paths:
+#       - target/*.jar
+#   tags:
+#     - master
 
-test:
-  stage: test
-  image: maven:3.8.4-openjdk-11-slim
-  script:
-    - mvn $MAVEN_CLI_OPTS test sonar:sonar -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_LOGIN -Dsonar.password=$SONAR_PASSWORD
-  tags:
-    - master
+# test:
+#   stage: test
+#   image: maven:3.8.4-openjdk-11-slim
+#   script:
+#     - mvn $MAVEN_CLI_OPTS test sonar:sonar -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_LOGIN -Dsonar.password=$SONAR_PASSWORD
+#   tags:
+#     - master
 
 
 docker_build:
@@ -71,6 +71,8 @@ deploy_dev:
       oc apply -f k8s/deployment.yml
   only:
     - /^feature-.*$/
+  tags:
+    - master
 
 
 deploy_qa:
@@ -86,6 +88,8 @@ deploy_qa:
     - /^feature-.*$/
   when: manual
   allow_failure: true
+  tags:
+    - master
 
 
 deploy_staging:
@@ -99,6 +103,8 @@ deploy_staging:
       oc apply -f k8s/deployment.yml
   only:
     - /^release-.*$/
+  tags:
+    - master
 
 # deploy_prod:
 #   stage: deploy
@@ -113,3 +119,5 @@ deploy_staging:
 #     - /^release-.*$/
 #   when: manual
 #   allow_failure: true
+  # tags:
+  #   - master
