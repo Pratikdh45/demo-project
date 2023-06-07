@@ -8,8 +8,7 @@ variables:
   MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version"
   MAVEN_OPTS: "-Dmaven.repo.local=${CI_PROJECT_DIR}/.m2/repository"
   DOCKER_IMAGE_PREFIX: "repository/docker-private/demo-project/quarkus-helloworld"
-  NEXUS: "172.30.38.4:8083"
-  CI_REGISTRY_IMAGE: "$NEXUS/$DOCKER_IMAGE_PREFIX:$VERSION"
+  CI_REGISTRY_IMAGE: "172.30.38.4:8083/repository/docker-private/demo-project/quarkus-helloworld"
   OC_IMAGE_NAME_AND_TAG: "repository/docker-private/alpine:oc-4.10.4"
   OPENSHIFT_SERVER: "https://api.openshift.mobicom.mn:6443"
   OPENSHIFT_PROJECT_DEV: "quarkus-demo-project"
@@ -23,15 +22,11 @@ build:
   script:
    - export VERSION=$(mvn --non-recursive help:evaluate -Dexpression=project.version -q -DforceStdout)
    - echo $VERSION > version.txt
-  #  - VERSION=$(mvn --non-recursive help:evaluate -Dexpression=project.version -q -DforceStdout)
-  #  - echo $VERSION
-  #  - mvn clean package -DskipTests -Dquarkus.container-image.build=false
+   - mvn clean package -DskipTests -Dquarkus.container-image.build=false
   artifacts:
     paths:
       - version.txt
-  #     - target/*.jar
-  # variables:
-  #   CI_COMMIT_SHORT_SHA: "$VERSION" 
+      - target/*.jar
   tags:
     - master
 
@@ -63,13 +58,11 @@ docker_build:
     - cat version.txt
     - export CI_COMMIT_SHORT_SHA=$(cat version.txt)
     - echo "CI_COMMIT_SHORT_SHA=${CI_COMMIT_SHORT_SHA}"
-    # - export VERSION=$(cat version.txt)
-    # - echo "CI_COMMIT_SHORT_SHA=${VERSION}"
     - echo "$CI_COMMIT_SHORT_SHA"
-    # - docker build -t $CI_REGISTRY_IMAGE .
-    # - docker images 
-    # - docker tag "$DOCKER_IMAGE_PREFIX" "$CI_REGISTRY_IMAGE:${VERSION}"
-    # - docker push "$CI_REGISTRY_IMAGE"
+    - docker build -t $DOCKER_IMAGE_PREFIX .
+    - docker images | grep $DOCKER_IMAGE_PREFIX
+    - docker tag "$DOCKER_IMAGE_PREFIX" "$CI_REGISTRY_IMAGE:${CI_COMMIT_SHORT_SHA}"
+    - docker push "$CI_REGISTRY_IMAGE"
   dependencies:
     - build 
   tags:
