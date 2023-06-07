@@ -60,8 +60,11 @@ docker_build:
     - echo $HOME/.docker/config.json
     - echo "Preparing for Docker image..."
   script:
-    - export VERSION=$(cat version.txt)
-    - echo "CI_COMMIT_SHORT_SHA=${VERSION}"
+    - cat version.txt
+    - export CI_COMMIT_SHORT_SHA=$(cat version.txt)
+    - echo "CI_COMMIT_SHORT_SHA=${CI_COMMIT_SHORT_SHA}"
+    # - export VERSION=$(cat version.txt)
+    # - echo "CI_COMMIT_SHORT_SHA=${VERSION}"
     - echo "$CI_COMMIT_SHORT_SHA"
     # - docker build -t $CI_REGISTRY_IMAGE .
     # - docker images 
