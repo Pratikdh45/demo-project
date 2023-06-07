@@ -22,7 +22,7 @@ build:
   image: maven:3.8.4-openjdk-11-slim
   script:
    - export VERSION=$(mvn --non-recursive help:evaluate -Dexpression=project.version -q -DforceStdout)
-   - echo $VERSION
+   - echo $VERSION > version.txt
   #  - VERSION=$(mvn --non-recursive help:evaluate -Dexpression=project.version -q -DforceStdout)
   #  - echo $VERSION
   #  - mvn clean package -DskipTests -Dquarkus.container-image.build=false
@@ -62,6 +62,7 @@ docker_build:
   script:
     - export VERSION=$(cat version.txt)
     - echo "CI_COMMIT_SHORT_SHA=${VERSION}"
+    - echo "$CI_COMMIT_SHORT_SHA"
     # - docker build -t $CI_REGISTRY_IMAGE .
     # - docker images 
     # - docker tag "$DOCKER_IMAGE_PREFIX" "$CI_REGISTRY_IMAGE:${VERSION}"
