@@ -54,6 +54,7 @@ docker_build:
     - echo $HOME/.docker/config.json
     - echo "Preparing for Docker image..."
   script:
+    - mv pom.xml pom.xml.bak || true
     - mv pom.xml.bak pom.xml
     - docker build -t $DOCKER_IMAGE_PREFIX .
     - docker images
