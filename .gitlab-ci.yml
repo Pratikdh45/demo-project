@@ -26,7 +26,8 @@ build:
   artifacts:
     paths:
       - target/*.jar
-      - pom.xml
+  variables:
+    VERSION: $VERSION
   tags:
     - master
 
