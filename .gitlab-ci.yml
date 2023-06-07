@@ -20,8 +20,8 @@ build:
   stage: build
   image: maven:3.8.4-openjdk-11-slim
   script:
-   - mvn versions:set -DnewVersion=${CI_COMMIT_SHORT_SHA} -f pom.xml
-   - echo "${CI_COMMIT_SHORT_SHA}"
+   - VERSION=$(mvn --non-recursive help:evaluate -Dexpression=project.version -q -DforceStdout)
+   - echo $VERSION
    - mvn clean package -DskipTests -Dquarkus.container-image.build=false
   artifacts:
     paths:
@@ -55,12 +55,10 @@ docker_build:
     - echo $HOME/.docker/config.json
     - echo "Preparing for Docker image..."
   script:
-    - mv pom.xml pom.xml.bak || true
-    - mv pom.xml.bak pom.xml
     - docker build -t $DOCKER_IMAGE_PREFIX .
-    - docker images
-    - docker tag "$DOCKER_IMAGE_PREFIX" "$CI_REGISTRY_IMAGE:${CI_COMMIT_SHORT_SHA}"
-    - docker push "$CI_REGISTRY_IMAGE:${CI_COMMIT_SHORT_SHA}"
+    - docker images | grep "$DOCKER_IMAGE_PREFIX"
+    - docker tag "$DOCKER_IMAGE_PREFIX" "$CI_REGISTRY_IMAGE:${VERSION}"
+    - docker push "$CI_REGISTRY_IMAGE:${VERSION}"
   dependencies:
     - build
   tags:
