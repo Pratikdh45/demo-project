@@ -1,5 +1,5 @@
 stages:
-  # - build
+  - build
 #  - test
   - docker_build
   - deploy
@@ -16,20 +16,20 @@ variables:
   OPENSHIFT_PROJECT_STAGING: "quarkus-demo-staging-project"
   OPENSHIFT_PROJECT_PROD: "quarkus-demo-prod-project"
 
-# build:
-#   stage: build
-#   image: maven:3.8.4-openjdk-11-slim
-#   script:
-#    - export VERSION=$(mvn --non-recursive help:evaluate -Dexpression=project.version -q -DforceStdout)
-#    - echo $VERSION > version.txt
-#    - mvn clean package -DskipTests -Dquarkus.container-image.build=false
-#    - chmod -R +x target/quarkus-app/quarkus-run.jar
-#   artifacts:
-#     paths:
-#       - version.txt
-#       - target/quarkus-app/quarkus-run.jar
-#   tags:
-#     - master
+build:
+  stage: build
+  image: maven:3.8.4-openjdk-11-slim
+  script:
+   - export VERSION=$(mvn --non-recursive help:evaluate -Dexpression=project.version -q -DforceStdout)
+   - echo $VERSION > version.txt
+   - mvn clean package -DskipTests -Dquarkus.container-image.build=false
+   - chmod -R +x target/quarkus-app/quarkus-run.jar
+  artifacts:
+    paths:
+      - version.txt
+      - target/quarkus-app/quarkus-run.jar
+  tags:
+    - master
 
 # test:
 #   stage: test
@@ -80,10 +80,10 @@ deploy_dev:
     - echo "Deploying to Dev environment..."
     - sed -i "s/VERSION:$CI_COMMIT_SHORT_SHA" k8s/deployment.yml
     - cat k8s/deployment.yml
-    # - |
-    #   oc login $OPENSHIFT_SERVER --token=$OCP_TOKEN_DEMO --insecure-skip-tls-verify=true
-    #   oc project $OPENSHIFT_PROJECT_DEV
-    #   oc apply -f k8s/deployment.yml
+    - |
+      oc login $OPENSHIFT_SERVER --token=$OCP_TOKEN_DEMO --insecure-skip-tls-verify=true
+      oc project $OPENSHIFT_PROJECT_DEV
+      oc apply -f k8s/deployment.yml
   only:
     - /^feature-.*$/
   tags:
