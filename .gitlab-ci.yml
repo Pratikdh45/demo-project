@@ -1,5 +1,5 @@
 stages:
-  - build
+#  - build
 #  - test
   - docker_build
 #  - deploy
@@ -16,20 +16,20 @@ variables:
   OPENSHIFT_PROJECT_STAGING: "quarkus-demo-staging-project"
   OPENSHIFT_PROJECT_PROD: "quarkus-demo-prod-project"
 
-build:
-  stage: build
-  image: maven:3.8.4-openjdk-11-slim
-  script:
-   - VERSION=$(mvn --non-recursive help:evaluate -Dexpression=project.version -q -DforceStdout)
-   - echo $VERSION
-   - mvn clean package -DskipTests -Dquarkus.container-image.build=false
-  artifacts:
-    paths:
-      - target/*.jar
-  variables:
-    VERSION: $VERSION
-  tags:
-    - master
+# build:
+#   stage: build
+#   image: maven:3.8.4-openjdk-11-slim
+#   script:
+#    - VERSION=$(mvn --non-recursive help:evaluate -Dexpression=project.version -q -DforceStdout)
+#    - echo $VERSION
+#    - mvn clean package -DskipTests -Dquarkus.container-image.build=false
+#   artifacts:
+#     paths:
+#       - target/*.jar
+#   variables:
+#     VERSION: $VERSION
+#   tags:
+#     - master
 
 # test:
 #   stage: test
@@ -58,7 +58,7 @@ docker_build:
   script:
     - |
       echo "Image reference: $DOCKER_IMAGE_PREFIX:${VERSION}"
-      docker build -t $DOCKER_IMAGE_PREFIX:${VERSION} .
+      docker build -t "$DOCKER_IMAGE_PREFIX:${VERSION}" .
       docker images | grep "$DOCKER_IMAGE_PREFIX"
       docker push "$DOCKER_IMAGE_PREFIX:${VERSION}"
 
