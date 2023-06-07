@@ -1,8 +1,8 @@
 stages:
-#  - build
+  - build
 #  - test
   - docker_build
-  - deploy
+#  - deploy
 
 variables:
   MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version"
@@ -16,16 +16,18 @@ variables:
   OPENSHIFT_PROJECT_STAGING: "quarkus-demo-staging-project"
   OPENSHIFT_PROJECT_PROD: "quarkus-demo-prod-project"
 
-# build:
-#   stage: build
-#   image: maven:3.8.4-openjdk-11-slim
-#   script:
-#    - mvn clean package -DskipTests -Dquarkus.container-image.build=false
-#   artifacts:
-#     paths:
-#       - target/*.jar
-#   tags:
-#     - master
+build:
+  stage: build
+  image: maven:3.8.4-openjdk-11-slim
+  script:
+   - mvn versions:set -DnewVersion=${CI_COMMIT_SHORT_SHA}
+   - mvn clean package -DskipTests -Dquarkus.container-image.build=false
+  artifacts:
+    paths:
+      - target/*.jar
+      - pom.xml
+  tags:
+    - master
 
 # test:
 #   stage: test
@@ -52,10 +54,13 @@ docker_build:
     - echo $HOME/.docker/config.json
     - echo "Preparing for Docker image..."
   script:
+    - mv pom.xml.bak pom.xml
     - docker build -t $DOCKER_IMAGE_PREFIX .
     - docker images
-    - docker tag "$DOCKER_IMAGE_PREFIX" "$CI_REGISTRY_IMAGE:${project.version}"
-    - docker push "$CI_REGISTRY_IMAGE:${project.version}"
+    - docker tag "$DOCKER_IMAGE_PREFIX" "$CI_REGISTRY_IMAGE:${CI_COMMIT_SHORT_SHA}"
+    - docker push "$CI_REGISTRY_IMAGE:${CI_COMMIT_SHORT_SHA}"
+  dependencies:
+    - build
   tags:
     - master
 
