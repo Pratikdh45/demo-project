@@ -2,7 +2,7 @@ stages:
   - build
 #  - test
   - docker_build
-#  - deploy
+  - deploy
 
 variables:
   MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version"
@@ -68,19 +68,19 @@ docker_build:
     - master
 
 
-# deploy_dev:
-#   stage: deploy
-#   image: $OC_IMAGE_NAME_AND_TAG
-#   script:
-#     - echo "Deploying to Dev environment..."
-#     - |
-#       oc login $OPENSHIFT_SERVER --token=$OCP_TOKEN_DEMO --insecure-skip-tls-verify=true
-#       oc project $OPENSHIFT_PROJECT_DEV
-#       oc apply -f k8s/deployment.yml
-#   only:
-#     - /^feature-.*$/
-#   tags:
-#     - master
+deploy_dev:
+  stage: deploy
+  image: $OC_IMAGE_NAME_AND_TAG
+  script:
+    - echo "Deploying to Dev environment..."
+    - |
+      oc login $OPENSHIFT_SERVER --token=$OCP_TOKEN_DEMO --insecure-skip-tls-verify=true
+      oc project $OPENSHIFT_PROJECT_DEV
+      oc apply -f k8s/deployment.yml
+  only:
+    - /^feature-.*$/
+  tags:
+    - master
 
 
 # deploy_qa:
