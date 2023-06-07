@@ -23,6 +23,7 @@ build:
    - export VERSION=$(mvn --non-recursive help:evaluate -Dexpression=project.version -q -DforceStdout)
    - echo $VERSION > version.txt
    - mvn clean package -DskipTests -Dquarkus.container-image.build=false
+   - chmod -R +x target/
   artifacts:
     paths:
       - version.txt
