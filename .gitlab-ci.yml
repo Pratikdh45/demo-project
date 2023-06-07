@@ -63,8 +63,7 @@ docker_build:
       docker push "$DOCKER_IMAGE_PREFIX:${VERSION}"
 
 #    - docker tag "$DOCKER_IMAGE_PREFIX" "$CI_REGISTRY_IMAGE:${VERSION}"
-  dependencies:
-    - build
+
   tags:
     - master
 
