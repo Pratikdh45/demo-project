@@ -1,6 +1,6 @@
 stages:
-#  - build
-#  - test
+  - build
+  - test
   - docker_build
   - deploy
 
@@ -10,26 +10,30 @@ variables:
   DOCKER_IMAGE_PREFIX: "repository/docker-private/demo-project/quarkus-helloworld"
   CI_REGISTRY_IMAGE: "172.30.38.4:8083/repository/docker-private/demo-project/quarkus-helloworld"
   OC_IMAGE_NAME_AND_TAG: "repository/docker-private/alpine:oc-4.10.4"
-  OPENSHIFT_PROJECT: "quarkus-demo-project"
+  OPENSHIFT_SERVER: "https://api.openshift.mobicom.mn:6443"
+  OPENSHIFT_PROJECT_DEV: "quarkus-demo-project"
+  OPENSHIFT_PROJECT_QA: "quarkus-demo-qa-project"
+  OPENSHIFT_PROJECT_STAGING: "quarkus-demo-staging-project"
+  OPENSHIFT_PROJECT_PROD: "quarkus-demo-prod-project"
 
-# build:
-#   stage: build
-#   image: maven:3.8.4-openjdk-11-slim
-#   script:
-#     - mvn clean package -DskipTests -Dquarkus.container-image.build=false
-#   artifacts:
-#     paths:
-#       - target/*.jar
-#   tags:
-#     - master
+build:
+  stage: build
+  image: maven:3.8.4-openjdk-11-slim
+  script:
+   - mvn clean package -DskipTests -Dquarkus.container-image.build=false
+  artifacts:
+    paths:
+      - target/*.jar
+  tags:
+    - master
 
-# test:
-#   stage: test
-#   image: maven:3.8.4-openjdk-11-slim
-#   script:
-#     - mvn $MAVEN_CLI_OPTS test sonar:sonar -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_LOGIN -Dsonar.password=$SONAR_PASSWORD
-#   tags:
-#    - master
+test:
+  stage: test
+  image: maven:3.8.4-openjdk-11-slim
+  script:
+    - mvn $MAVEN_CLI_OPTS test sonar:sonar -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_LOGIN -Dsonar.password=$SONAR_PASSWORD
+  tags:
+    - master
 
 
 docker_build:
@@ -55,14 +59,57 @@ docker_build:
   tags:
     - master
 
-deploy:
+
+deploy_dev:
   stage: deploy
   image: $OC_IMAGE_NAME_AND_TAG
   script:
-    - echo "Deploying to OpenShift..."
+    - echo "Deploying to Dev environment..."
     - |
-      oc login https://api.openshift.mobicom.mn:6443 --token=$OCP_TOKEN_DEMO --insecure-skip-tls-verify=true
-      oc project $OPENSHIFT_PROJECT
+      oc login $OPENSHIFT_SERVER --token=$OCP_TOKEN_DEMO --insecure-skip-tls-verify=true
+      oc project $OPENSHIFT_PROJECT_DEV
       oc apply -f k8s/deployment.yml
-  tags:
-    - master
+  only:
+    - /^feature-.*$/
+
+
+deploy_qa:
+  stage: deploy
+  image: $OC_IMAGE_NAME_AND_TAG
+  script:
+    - echo "Deploying to QA environment..."
+    - |
+      oc login $OPENSHIFT_SERVER --token=$OCP_TOKEN_DEMO --insecure-skip-tls-verify=true
+      oc project $OPENSHIFT_PROJECT_QA
+      oc apply -f k8s/deployment.yml
+  only:
+    - /^feature-.*$/
+  when: manual
+  allow_failure: true
+
+
+deploy_staging:
+  stage: deploy
+  image: $OC_IMAGE_NAME_AND_TAG
+  script:
+    - echo "Deploying to Staging environment..."
+    - |
+      oc login $OPENSHIFT_SERVER --token=$OCP_TOKEN_DEMO --insecure-skip-tls-verify=true
+      oc project $OPENSHIFT_PROJECT_STAGING
+      oc apply -f k8s/deployment.yml
+  only:
+    - /^release-.*$/
+
+# deploy_prod:
+#   stage: deploy
+#   image: $OC_IMAGE_NAME_AND_TAG
+#   script:
+#     - echo "Deploying to Production environment..."
+#     - |
+#       oc login $OPENSHIFT_SERVER --token=$OCP_TOKEN_DEMO --insecure-skip-tls-verify=true
+#       oc project $OPENSHIFT_PROJECT_PROD
+#       oc apply -f k8s/deployment.yml
+#   only:
+#     - /^release-.*$/
+#   when: manual
+#   allow_failure: true
