@@ -78,7 +78,7 @@ deploy_dev:
     - echo "$CI_COMMIT_SHORT_SHA"
   script:
     - echo "Deploying to Dev environment..."
-    - sed -i "s/VERSION:$CI_COMMIT_SHORT_SHA" k8s/deployment.yml
+    - sed -i "s/VERSION:$CI_COMMIT_SHORT_SHA/g" k8s/deployment.yml
     - cat k8s/deployment.yml
     - |
       oc login $OPENSHIFT_SERVER --token=$OCP_TOKEN_DEMO --insecure-skip-tls-verify=true
