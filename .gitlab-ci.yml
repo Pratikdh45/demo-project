@@ -23,11 +23,11 @@ build:
    - export VERSION=$(mvn --non-recursive help:evaluate -Dexpression=project.version -q -DforceStdout)
    - echo $VERSION > version.txt
    - mvn clean package -DskipTests -Dquarkus.container-image.build=false
-   - chmod -R +x target/
+   - chmod -R +x target/quarkus-app/quarkus-run.jar
   artifacts:
     paths:
       - version.txt
-      - target/*.jar
+      - target/quarkus-app/quarkus-run.jar
   tags:
     - master
 
@@ -89,7 +89,7 @@ deploy_dev:
 #   script:
 #     - echo "Deploying to QA environment..."
 #     - |
-#       oc login $OPENSHIFT_SERVER --token=$OCP_TOKEN_DEMO --insecure-skip-tls-verify=true
+#       oc login $OPENSHIFT_SERVER --token=$OCP_TOKEN_DEMO_QA --insecure-skip-tls-verify=true
 #       oc project $OPENSHIFT_PROJECT_QA
 #       oc apply -f k8s/deployment.yml
 #   only:
@@ -106,7 +106,7 @@ deploy_dev:
 #   script:
 #     - echo "Deploying to Staging environment..."
 #     - |
-#       oc login $OPENSHIFT_SERVER --token=$OCP_TOKEN_DEMO --insecure-skip-tls-verify=true
+#       oc login $OPENSHIFT_SERVER --token=$OCP_TOKEN_DEMO_STAGING --insecure-skip-tls-verify=true
 #       oc project $OPENSHIFT_PROJECT_STAGING
 #       oc apply -f k8s/deployment.yml
 #   only:
@@ -120,7 +120,7 @@ deploy_dev:
 #   script:
 #     - echo "Deploying to Production environment..."
 #     - |
-#       oc login $OPENSHIFT_SERVER --token=$OCP_TOKEN_DEMO --insecure-skip-tls-verify=true
+#       oc login $OPENSHIFT_SERVER --token=$OCP_TOKEN_DEMO_PROD --insecure-skip-tls-verify=true
 #       oc project $OPENSHIFT_PROJECT_PROD
 #       oc apply -f k8s/deployment.yml
 #   only:
