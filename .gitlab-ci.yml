@@ -26,11 +26,12 @@ build:
   #  - VERSION=$(mvn --non-recursive help:evaluate -Dexpression=project.version -q -DforceStdout)
   #  - echo $VERSION
   #  - mvn clean package -DskipTests -Dquarkus.container-image.build=false
-  # artifacts:
-  #   paths:
+  artifacts:
+    paths:
+      - version.txt
   #     - target/*.jar
-  variables:
-    CI_COMMIT_SHORT_SHA: "$VERSION" 
+  # variables:
+  #   CI_COMMIT_SHORT_SHA: "$VERSION" 
   tags:
     - master
 
@@ -59,7 +60,8 @@ docker_build:
     - echo $HOME/.docker/config.json
     - echo "Preparing for Docker image..."
   script:
-    - echo "CI_COMMIT_SHORT_SHA=${VERSION}" 
+    - export VERSION=$(cat version.txt)
+    - echo "CI_COMMIT_SHORT_SHA=${VERSION}"
     # - docker build -t $CI_REGISTRY_IMAGE .
     # - docker images 
     # - docker tag "$DOCKER_IMAGE_PREFIX" "$CI_REGISTRY_IMAGE:${VERSION}"
