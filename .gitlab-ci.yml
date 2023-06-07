@@ -56,11 +56,13 @@ docker_build:
     - echo $HOME/.docker/config.json
     - echo "Preparing for Docker image..."
   script:
-    - echo "Image reference: $DOCKER_IMAGE_PREFIX:${VERSION}"
-    - docker build -t $DOCKER_IMAGE_PREFIX:${VERSION} .
-    - docker images | grep "$DOCKER_IMAGE_PREFIX"
+    - |
+      echo "Image reference: $DOCKER_IMAGE_PREFIX:${VERSION}"
+      docker build -t $DOCKER_IMAGE_PREFIX:${VERSION} .
+      docker images | grep "$DOCKER_IMAGE_PREFIX"
+      docker push "$DOCKER_IMAGE_PREFIX:${VERSION}"
+
 #    - docker tag "$DOCKER_IMAGE_PREFIX" "$CI_REGISTRY_IMAGE:${VERSION}"
-    - docker push "$DOCKER_IMAGE_PREFIX:${VERSION}"
   dependencies:
     - build
   tags:
