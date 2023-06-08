@@ -133,7 +133,7 @@ deploy_dev:
     variables:
       - $INCREMENTAL_ROLLOUT_MODE == "timed"
 
-timed rollout 10%:
+timed rollout 10pct:
   <<: *rollout_template
   stage: incremental_rollout_10%
   variables:
@@ -167,7 +167,7 @@ rollback_dev:
     - exists:
         - incremental_rollout_10pct
 
-timed rollout 100%:
+timed rollout 100pct:
   <<: *rollout_template
   stage: incremental_rollout_100%
   variables:
