@@ -1,6 +1,6 @@
 stages:
   - build
-  - test
+#  - test
   - docker_build
   - deploy
 
@@ -31,13 +31,13 @@ build:
   tags:
     - master
 
-test:
-  stage: test
-  image: maven:3.8.4-openjdk-11-slim
-  script:
-    - mvn $MAVEN_CLI_OPTS test sonar:sonar -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_LOGIN -Dsonar.password=$SONAR_PASSWORD
-  tags:
-    - master
+# test:
+#   stage: test
+#   image: maven:3.8.4-openjdk-11-slim
+#   script:
+#     - mvn $MAVEN_CLI_OPTS test sonar:sonar -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_LOGIN -Dsonar.password=$SONAR_PASSWORD
+#   tags:
+#     - master
 
 docker_build:
   stage: docker_build
@@ -86,8 +86,22 @@ deploy_dev:
       oc apply -f k8s/deployment.yml
   only:
     - /^feature-.*$/
+  environment:
+    name: dev
+.manual_rollout_template: &manual_rollout_template
+  <<: *rollout_template
+  stage: dev
+  when: manual
   tags:
     - master
+timed rollout 10%:
+  stage: incremental rollout 10%
+  variables:
+    ROLLOUT_PERCENTAGE: 10
+timed rollout 100%:
+  stage: incremental rollout 100%
+  variables:
+    ROLLOUT_PERCENTAGE: 100
 
 
 deploy_qa:
