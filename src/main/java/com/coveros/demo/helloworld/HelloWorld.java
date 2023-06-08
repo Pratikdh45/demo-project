@@ -1,11 +1,6 @@
 package com.coveros.demo.helloworld;
-package com.knf.endpoint;
 
-
-import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.logging.Level;
@@ -26,7 +21,17 @@ public class HelloWorld {
         // Print log message
         logger.info("Hello, World! The current time is " + dtf.format(now));
     }
+}
 
+package com.knf.endpoint;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+
+@Path("/api/hello")
+public class EndPoint {
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public String getUsers() {
