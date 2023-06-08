@@ -22,19 +22,3 @@ public class HelloWorld {
         logger.info("Hello, World! The current time is " + dtf.format(now));
     }
 }
-
-package com.knf.endpoint;
-
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-
-@Path("/api/hello")
-public class EndPoint {
-    @GET
-    @Produces(MediaType.TEXT_PLAIN)
-    public String getUsers() {
-        return "Hello World";
-    }
-}
