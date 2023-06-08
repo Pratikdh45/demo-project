@@ -3,6 +3,8 @@ stages:
 #  - test
   - docker_build
   - deploy
+  - incremental rollout 10%
+  - incremental rollout 100%
 
 variables:
   MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version"
@@ -86,23 +88,36 @@ deploy_dev:
       oc apply -f k8s/deployment.yml
   only:
     - /^feature-.*$/
-  environment:
-    name: dev
-.manual_rollout_template: &manual_rollout_template
-  <<: *rollout_template
-  stage: dev
-  when: manual
   tags:
     - master
+  environment:
+    name: dev
+
 timed rollout 10%:
   stage: incremental rollout 10%
   variables:
     ROLLOUT_PERCENTAGE: 10
+  # ...
+
 timed rollout 100%:
   stage: incremental rollout 100%
   variables:
     ROLLOUT_PERCENTAGE: 100
 
+.deploy_manual:
+  <<: *manual_rollout_template
+  stage: dev
+  when: manual
+  only:
+    refs:
+      - /^feature-.*$/
+    kubernetes: active
+    variables:
+      - $INCREMENTAL_ROLLOUT_MODE == "manual"
+      - $INCREMENTAL_ROLLOUT_ENABLED
+  except:
+    variables:
+      - $INCREMENTAL_ROLLOUT_MODE == "timed"
 
 deploy_qa:
   stage: deploy
