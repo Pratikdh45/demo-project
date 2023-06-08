@@ -18,5 +18,5 @@ spec:
           image: 172.30.38.4:8083/repository/docker-private/demo-project/quarkus-helloworld:VERSION
           ports:
             - name: http
-            - containerPort: 8080
-            - protocol: TCP
+              containerPort: 8080
+              protocol: TCP
