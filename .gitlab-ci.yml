@@ -118,7 +118,7 @@ deploy_dev:
     - master
     
 .deploy_manual:
-  <<: *manual_rollout_template
+  <<: *rollout_template
   stage: dev
   when: manual
   only:
