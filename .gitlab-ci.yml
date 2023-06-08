@@ -4,6 +4,7 @@ stages:
   - docker_build
   - deploy
   - incremental_rollout_10%
+  - rollback
   - incremental_rollout_100%
 
 variables:
@@ -137,6 +138,33 @@ timed rollout 10%:
   stage: incremental_rollout_10%
   variables:
     ROLLOUT_PERCENTAGE: 10
+  script:
+    - echo "Performing 10% incremental rollout..."
+    # Add your steps for the 10% rollout here
+  retry:
+    max: 2
+    when:
+      - runner_system_failure
+      - stuck_or_timeout_failure
+      - api_failure
+  environment:
+    name: incremental_rollout_10%
+    action: stop
+    auto_stop_in: 1 min
+
+rollback_dev:
+  stage: rollback
+  script:
+    - echo "Rolling back Dev environment..."
+    - # Add your rollback script here
+  environment:
+    name: dev
+    action: stop
+  only:
+    - /^feature-.*$/
+    - branches
+  dependencies:
+    - "timed rollout 10%"
 
 timed rollout 100%:
   <<: *rollout_template
