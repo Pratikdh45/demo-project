@@ -56,9 +56,6 @@
             <name>${docker.image.prefix}</name>
             <format>docker</format>
           </container-image>
-          <systemProperties>
-            <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
-          </systemProperties>
         </configuration>
       </plugin>
       <plugin>
