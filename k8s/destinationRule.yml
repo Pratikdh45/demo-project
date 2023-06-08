@@ -1,0 +1,10 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: my-quarkus-app
+  namespace: NAMESPACE
+spec:
+  host: NAMESPACE
+  trafficPolicy:
+    tls:
+      mode: DISABLE
