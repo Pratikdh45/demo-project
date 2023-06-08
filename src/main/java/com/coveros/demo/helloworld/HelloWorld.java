@@ -1,4 +1,6 @@
 package com.coveros.demo.helloworld;
+package com.knf.endpoint;
+
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
