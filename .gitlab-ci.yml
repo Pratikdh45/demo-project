@@ -4,7 +4,6 @@ stages:
   - docker_build
   - deploy
   - incremental_rollout_10%
-  - rollback
   - incremental_rollout_100%
 
 variables:
@@ -56,6 +55,7 @@ docker_build:
     - mkdir -p $HOME/.docker
     - echo $DOCKER_AUTH_CONFIG > $HOME/.docker/config.json
     - echo $HOME/.docker/config.json
+    - chmod -R +x target/quarkus-app/quarkus-run.jar
     - echo "Preparing for Docker image..."
   script:
     - cat version.txt
@@ -92,86 +92,6 @@ deploy_dev:
     - /^feature-.*$/
   tags:
     - master
-  environment:
-    name: dev
-
-.rollout_template: &rollout_template
-  stage: incremental rollout
-  image: $OC_IMAGE_NAME_AND_TAG
-  before_script:
-    - cat version.txt
-    - export CI_COMMIT_SHORT_SHA=$(cat version.txt)
-    - echo "CI_COMMIT_SHORT_SHA=${CI_COMMIT_SHORT_SHA}"
-    - echo "$CI_COMMIT_SHORT_SHA"
-  script:
-    - echo "Performing incremental rollout..."
-    - sed -i "s/VERSION/$CI_COMMIT_SHORT_SHA/g" k8s/deployment.yml
-    - sed -i "s/NAMESPACE/$OPENSHIFT_PROJECT_DEV/g" k8s/deployment.yml
-    - cat k8s/deployment.yml
-    - |
-      oc login $OPENSHIFT_SERVER --token=$OCP_TOKEN_DEMO --insecure-skip-tls-verify=true
-      oc project $OPENSHIFT_PROJECT_DEV
-      oc apply -f k8s/deployment.yml
-      # Perform incremental rollout logic here
-  only:
-    - /^feature-.*$/
-  tags:
-    - master
-    
-.deploy_manual:
-  <<: *rollout_template
-  stage: dev
-  when: manual
-  only:
-    refs:
-      - /^feature-.*$/
-    kubernetes: active
-    variables:
-      - $INCREMENTAL_ROLLOUT_MODE == "manual"
-      - $INCREMENTAL_ROLLOUT_ENABLED
-  except:
-    variables:
-      - $INCREMENTAL_ROLLOUT_MODE == "timed"
-
-timed rollout 10pct:
-  <<: *rollout_template
-  stage: incremental_rollout_10%
-  variables:
-    ROLLOUT_PERCENTAGE: 10
-  script:
-    - echo "Performing 10% incremental rollout..."
-    # Add your steps for the 10% rollout here
-  retry:
-    max: 2
-    when:
-      - runner_system_failure
-      - stuck_or_timeout_failure
-      - api_failure
-  environment:
-    name: incremental_rollout_10%
-    action: stop
-    auto_stop_in: 1 min
-
-rollback_dev:
-  stage: rollback
-  script:
-    - echo "Rolling back Dev environment..."
-    - # Add your rollback script here
-  environment:
-    name: dev
-    action: stop
-  only:
-    - /^feature-.*$/
-    - branches
-  rules:
-    - exists:
-        - incremental_rollout_10pct
-
-timed rollout 100pct:
-  <<: *rollout_template
-  stage: incremental_rollout_100%
-  variables:
-    ROLLOUT_PERCENTAGE: 100
 
 deploy_qa:
   stage: deploy
@@ -243,3 +163,53 @@ deploy_qa:
 #   allow_failure: true
 #   tags:
 #     - master
+
+.rollout_template: &rollout_template
+  stage: incremental rollout
+  image: $OC_IMAGE_NAME_AND_TAG
+  before_script:
+    - cat version.txt
+    - export CI_COMMIT_SHORT_SHA=$(cat version.txt)
+    - echo "CI_COMMIT_SHORT_SHA=${CI_COMMIT_SHORT_SHA}"
+    - echo "$CI_COMMIT_SHORT_SHA"
+  script:
+    - echo "Performing incremental rollout..."
+    - sed -i "s/VERSION/$CI_COMMIT_SHORT_SHA/g" k8s/deployment.yml
+    - sed -i "s/NAMESPACE/$OPENSHIFT_PROJECT_DEV/g" k8s/deployment.yml
+    - cat k8s/deployment.yml
+    - |
+      oc login $OPENSHIFT_SERVER --token=$OCP_TOKEN_DEMO --insecure-skip-tls-verify=true
+      oc project $OPENSHIFT_PROJECT_DEV
+      oc apply -f k8s/deployment.yml
+      # Perform incremental rollout logic here
+  only:
+    - /^feature-.*$/
+  tags:
+    - master
+    
+.deploy_manual:
+  <<: *rollout_template
+  stage: prod
+  when: manual
+  only:
+    refs:
+      - /^feature-.*$/
+    kubernetes: active
+    variables:
+      - $INCREMENTAL_ROLLOUT_MODE == "manual"
+      - $INCREMENTAL_ROLLOUT_ENABLED
+  except:
+    variables:
+      - $INCREMENTAL_ROLLOUT_MODE == "timed"
+
+timed rollout 10pct:
+  <<: *rollout_template
+  stage: incremental_rollout_10%
+  variables:
+    ROLLOUT_PERCENTAGE: 10
+
+timed rollout 100pct:
+  <<: *rollout_template
+  stage: incremental_rollout_100%
+  variables:
+    ROLLOUT_PERCENTAGE: 100
