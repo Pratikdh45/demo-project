@@ -1,12 +1,10 @@
 package com.coveros.demo.helloworld;
 
-import javax.ws.rs.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@Path("/api/hello")
 public class HelloWorld {
 
     private static final Logger logger = Logger.getLogger(HelloWorld.class.getName());
