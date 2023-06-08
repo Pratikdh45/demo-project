@@ -3,10 +3,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Scanner;
 
-/**
-* Written by Martin Ombura Jr. <@martinomburajr>
-*/
-public class MyServer {
+
+public class HelloWorld {
     public static void main(String[] args) {
         connectToServer();
     }
