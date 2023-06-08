@@ -3,8 +3,8 @@ stages:
 #  - test
   - docker_build
   - deploy
-  - incremental rollout 10%
-  - incremental rollout 100%
+  - incremental_rollout_10%
+  - incremental_rollout_100%
 
 variables:
   MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version"
@@ -116,19 +116,31 @@ deploy_dev:
     - /^feature-.*$/
   tags:
     - master
-
+    
 .deploy_manual:
-  <<: *rollout_template
-  stage: deploy
+  <<: *manual_rollout_template
+  stage: dev
   when: manual
+  only:
+    refs:
+      - /^feature-.*$/
+    kubernetes: active
+    variables:
+      - $INCREMENTAL_ROLLOUT_MODE == "manual"
+      - $INCREMENTAL_ROLLOUT_ENABLED
+  except:
+    variables:
+      - $INCREMENTAL_ROLLOUT_MODE == "timed"
 
 timed rollout 10%:
   <<: *rollout_template
+  stage: incremental_rollout_10%
   variables:
     ROLLOUT_PERCENTAGE: 10
 
 timed rollout 100%:
   <<: *rollout_template
+  stage: incremental_rollout_100%
   variables:
     ROLLOUT_PERCENTAGE: 100
 
@@ -157,48 +169,48 @@ deploy_qa:
     - master
 
 
-deploy_staging:
-  stage: deploy
-  image: $OC_IMAGE_NAME_AND_TAG
-  before_script:
-    - cat version.txt
-    - export CI_COMMIT_SHORT_SHA=$(cat version.txt)
-    - echo "CI_COMMIT_SHORT_SHA=${CI_COMMIT_SHORT_SHA}"
-    - echo "$CI_COMMIT_SHORT_SHA"
-  script:
-    - echo "Deploying to Staging environment..."
-    - sed -i "s/VERSION/$CI_COMMIT_SHORT_SHA/g" k8s/deployment.yml
-    - sed -i "s/NAMESPACE/$OPENSHIFT_PROJECT_STAGING/g" k8s/deployment.yml
-    - cat k8s/deployment.yml
-    - |
-      oc login $OPENSHIFT_SERVER --token=$OCP_TOKEN_DEMO_STAGING --insecure-skip-tls-verify=true
-      oc project $OPENSHIFT_PROJECT_STAGING
-      oc apply -f k8s/deployment.yml
-  only:
-    - /^release-.*$/
-  tags:
-    - master
+# deploy_staging:
+#   stage: deploy
+#   image: $OC_IMAGE_NAME_AND_TAG
+#   before_script:
+#     - cat version.txt
+#     - export CI_COMMIT_SHORT_SHA=$(cat version.txt)
+#     - echo "CI_COMMIT_SHORT_SHA=${CI_COMMIT_SHORT_SHA}"
+#     - echo "$CI_COMMIT_SHORT_SHA"
+#   script:
+#     - echo "Deploying to Staging environment..."
+#     - sed -i "s/VERSION/$CI_COMMIT_SHORT_SHA/g" k8s/deployment.yml
+#     - sed -i "s/NAMESPACE/$OPENSHIFT_PROJECT_STAGING/g" k8s/deployment.yml
+#     - cat k8s/deployment.yml
+#     - |
+#       oc login $OPENSHIFT_SERVER --token=$OCP_TOKEN_DEMO_STAGING --insecure-skip-tls-verify=true
+#       oc project $OPENSHIFT_PROJECT_STAGING
+#       oc apply -f k8s/deployment.yml
+#   only:
+#     - /^release-.*$/
+#   tags:
+#     - master
 
-deploy_prod:
-  stage: deploy
-  image: $OC_IMAGE_NAME_AND_TAG
-  before_script:
-    - cat version.txt
-    - export CI_COMMIT_SHORT_SHA=$(cat version.txt)
-    - echo "CI_COMMIT_SHORT_SHA=${CI_COMMIT_SHORT_SHA}"
-    - echo "$CI_COMMIT_SHORT_SHA"
-  script:
-    - echo "Deploying to Production environment..."
-    - sed -i "s/VERSION/$CI_COMMIT_SHORT_SHA/g" k8s/deployment.yml
-    - sed -i "s/NAMESPACE/$OPENSHIFT_PROJECT_PROD/g" k8s/deployment.yml
-    - cat k8s/deployment.yml
-    - |
-      oc login $OPENSHIFT_SERVER --token=$OCP_TOKEN_DEMO_PROD --insecure-skip-tls-verify=true
-      oc project $OPENSHIFT_PROJECT_PROD
-      oc apply -f k8s/deployment.yml
-  only:
-    - /^release-.*$/
-  when: manual
-  allow_failure: true
-  tags:
-    - master
+# deploy_prod:
+#   stage: deploy
+#   image: $OC_IMAGE_NAME_AND_TAG
+#   before_script:
+#     - cat version.txt
+#     - export CI_COMMIT_SHORT_SHA=$(cat version.txt)
+#     - echo "CI_COMMIT_SHORT_SHA=${CI_COMMIT_SHORT_SHA}"
+#     - echo "$CI_COMMIT_SHORT_SHA"
+#   script:
+#     - echo "Deploying to Production environment..."
+#     - sed -i "s/VERSION/$CI_COMMIT_SHORT_SHA/g" k8s/deployment.yml
+#     - sed -i "s/NAMESPACE/$OPENSHIFT_PROJECT_PROD/g" k8s/deployment.yml
+#     - cat k8s/deployment.yml
+#     - |
+#       oc login $OPENSHIFT_SERVER --token=$OCP_TOKEN_DEMO_PROD --insecure-skip-tls-verify=true
+#       oc project $OPENSHIFT_PROJECT_PROD
+#       oc apply -f k8s/deployment.yml
+#   only:
+#     - /^release-.*$/
+#   when: manual
+#   allow_failure: true
+#   tags:
+#     - master
