@@ -1,5 +1,5 @@
 FROM maven:3.8.4-openjdk-11-slim
-COPY . /usr/src
-WORKDIR /usr/src 
+WORKDIR /usr/src
+COPY . /usr/src 
 EXPOSE 8080
-CMD ["java", "-jar", "quarkus-helloworld-5.0.0-SNAPSHOT.jar"]
+CMD ["java", "-jar", "helloworld-6.0.0-SNAPSHOT.jar"]
