@@ -165,7 +165,7 @@ rollback_dev:
     - branches
   rules:
     - exists:
-        - timed rollout 10%
+        - "timed rollout 10%"
 
 timed rollout 100%:
   <<: *rollout_template
