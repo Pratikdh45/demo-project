@@ -25,11 +25,11 @@ build:
    - export VERSION=$(mvn --non-recursive help:evaluate -Dexpression=project.version -q -DforceStdout)
    - echo $VERSION > version.txt
    - mvn clean package -DskipTests -Dquarkus.container-image.build=false
-   - chmod -R +x target/
+   - chmod -R +x target
   artifacts:
     paths:
       - version.txt
-      - target/
+      - target
   tags:
     - master
 
@@ -55,7 +55,7 @@ docker_build:
     - mkdir -p $HOME/.docker
     - echo $DOCKER_AUTH_CONFIG > $HOME/.docker/config.json
     - echo $HOME/.docker/config.json
-    - chmod -R +x target/
+    - chmod -R +x target
     - echo "Preparing for Docker image..."
   script:
     - cat version.txt
