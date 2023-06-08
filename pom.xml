@@ -32,21 +32,6 @@
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-container-image-jib</artifactId>
     </dependency>
-    <dependency>
-      <groupId>javax.ws.rs</groupId>
-      <artifactId>javax.ws.rs-api</artifactId>
-      <version>2.1</version>
-    </dependency>
-    <dependency>
-      <groupId>javax.ws.rs</groupId>
-      <artifactId>jsr311-api</artifactId>
-      <version>1.1.1</version>
-    </dependency>
-    <dependency>
-      <groupId>javax.ws.rs</groupId>
-      <artifactId>javax.ws.rs.core</artifactId>
-      <version>2.1</version>
-    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -71,6 +56,11 @@
             <name>${docker.image.prefix}</name>
             <format>docker</format>
           </container-image>
+        </configuration>
+        <configuration>
+          <systemProperties>
+<java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
+          </systemProperties>
         </configuration>
       </plugin>
       <plugin>
