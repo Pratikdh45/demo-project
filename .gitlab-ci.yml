@@ -151,6 +151,7 @@ timed rollout 10%:
     name: incremental_rollout_10%
     action: stop
     auto_stop_in: 1 min
+
 rollback_dev:
   stage: rollback
   script:
@@ -164,7 +165,8 @@ rollback_dev:
     - branches
   rules:
     - exists:
-        - incremental_rollout_10%
+        - incremental_rollout_10pct
+
 timed rollout 100%:
   <<: *rollout_template
   stage: incremental_rollout_100%
