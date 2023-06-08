@@ -87,7 +87,6 @@ deploy_dev:
     - |
       oc login $OPENSHIFT_SERVER --token=$OCP_TOKEN_DEMO --insecure-skip-tls-verify=true
       oc project $OPENSHIFT_PROJECT_DEV
-      oc delete pod my-quarkus-app-666564b974-28mcf
       oc apply -f k8s/deployment.yml
   only:
     - /^feature-.*$/
