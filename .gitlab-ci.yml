@@ -83,14 +83,12 @@ deploy_dev:
     - echo "Deploying to Dev environment..."
     - sed -i "s/VERSION/$CI_COMMIT_SHORT_SHA/g" k8s/deployment.yml
     - sed -i "s/NAMESPACE/$OPENSHIFT_PROJECT_DEV/g" k8s/deployment.yml
-    - sed -i "s/NAMESPACE/$OPENSHIFT_PROJECT_DEV/g" k8s/service.yml
-    - sed -i "s/NAMESPACE/$OPENSHIFT_PROJECT_DEV/g" k8s/virtualService.yml
-    - sed -i "s/NAMESPACE/$OPENSHIFT_PROJECT_DEV/g" k8s/destinationRule.yml
+    # - sed -i "s/NAMESPACE/$OPENSHIFT_PROJECT_DEV/g" k8s/service.yml
     - cat k8s/deployment.yml
     - |
       oc login $OPENSHIFT_SERVER --token=$OCP_TOKEN_DEMO --insecure-skip-tls-verify=true
       oc project $OPENSHIFT_PROJECT_DEV
-      oc apply -f k8s/
+      oc apply -f k8s/deployment.yml
   only:
     - /^feature-.*$/
   tags:
