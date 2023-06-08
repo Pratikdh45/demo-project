@@ -24,39 +24,29 @@
     </dependencies>
   </dependencyManagement>
   <dependencies>
-    <dependency>
-      <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-resteasy</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-container-image-jib</artifactId>
-    </dependency>
+ <!-- https://mvnrepository.com/artifact/com.sun.net.httpserver/http -->
+<dependency>
+    <groupId>com.sun.net.httpserver</groupId>
+    <artifactId>http</artifactId>
+    <version>20070405</version>
+</dependency>
   </dependencies>
   <build>
     <plugins>
-      <plugin>
-        <groupId>io.quarkus</groupId>
-        <artifactId>quarkus-maven-plugin</artifactId>
-        <version>${quarkus.version}</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>build</goal>
-              <goal>generate-code</goal>
-              <goal>generate-code-tests</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <container-image>
-            <build>
-              <enabled>true</enabled>
-            </build>
-            <name>${docker.image.prefix}</name>
-            <format>docker</format>
-          </container-image>
-        </configuration>
+     <plugin>
+      <!-- Build an executable JAR -->
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-jar-plugin</artifactId>
+      <version>3.1.0</version>
+      <configuration>
+        <archive>
+          <manifest>
+            <addClasspath>true</addClasspath>
+            <classpathPrefix>lib/</classpathPrefix>
+            <mainClass>com.coveros.demo.helloworld.HelloWorld</mainClass>
+          </manifest>
+        </archive>
+      </configuration>
       </plugin>
       <plugin>
         <groupId>org.sonarsource.scanner.maven</groupId>
