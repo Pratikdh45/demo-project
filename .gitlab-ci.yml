@@ -1,6 +1,6 @@
 stages:
   - build
-#  - test
+  - test
   - docker_build
   - deploy
 
@@ -31,13 +31,13 @@ build:
   tags:
     - master
 
-# test:
-#   stage: test
-#   image: maven:3.8.4-openjdk-11-slim
-#   script:
-#     - mvn $MAVEN_CLI_OPTS test sonar:sonar -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_LOGIN -Dsonar.password=$SONAR_PASSWORD
-#   tags:
-#     - master
+test:
+  stage: test
+  image: maven:3.8.4-openjdk-11-slim
+  script:
+    - mvn $MAVEN_CLI_OPTS test sonar:sonar -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_LOGIN -Dsonar.password=$SONAR_PASSWORD
+  tags:
+    - master
 
 docker_build:
   stage: docker_build
@@ -90,49 +90,70 @@ deploy_dev:
     - master
 
 
-# deploy_qa:
-#   stage: deploy
-#   image: $OC_IMAGE_NAME_AND_TAG
-#   script:
-#     - echo "Deploying to QA environment..."
-#     - |
-#       oc login $OPENSHIFT_SERVER --token=$OCP_TOKEN_DEMO_QA --insecure-skip-tls-verify=true
-#       oc project $OPENSHIFT_PROJECT_QA
-#       oc apply -f k8s/deployment.yml
-#   only:
-#     - /^feature-.*$/
-#   when: manual
-#   allow_failure: true
-#   tags:
-#     - master
+deploy_qa:
+  stage: deploy
+  image: $OC_IMAGE_NAME_AND_TAG
+  before_script:
+    - cat version.txt
+    - export CI_COMMIT_SHORT_SHA=$(cat version.txt)
+    - echo "CI_COMMIT_SHORT_SHA=${CI_COMMIT_SHORT_SHA}"
+    - echo "$CI_COMMIT_SHORT_SHA"
+  script:
+    - echo "Deploying to QA environment..."
+    - sed -i "s/VERSION/$CI_COMMIT_SHORT_SHA/g" k8s/deployment.yml
+    - cat k8s/deployment.yml
+    - |
+      oc login $OPENSHIFT_SERVER --token=$OCP_TOKEN_DEMO_QA --insecure-skip-tls-verify=true
+      oc project $OPENSHIFT_PROJECT_QA
+      oc apply -f k8s/deployment.yml
+  only:
+    - /^feature-.*$/
+  when: manual
+  allow_failure: true
+  tags:
+    - master
 
 
-# deploy_staging:
-#   stage: deploy
-#   image: $OC_IMAGE_NAME_AND_TAG
-#   script:
-#     - echo "Deploying to Staging environment..."
-#     - |
-#       oc login $OPENSHIFT_SERVER --token=$OCP_TOKEN_DEMO_STAGING --insecure-skip-tls-verify=true
-#       oc project $OPENSHIFT_PROJECT_STAGING
-#       oc apply -f k8s/deployment.yml
-#   only:
-#     - /^release-.*$/
-#   tags:
-#     - master
+deploy_staging:
+  stage: deploy
+  image: $OC_IMAGE_NAME_AND_TAG
+  before_script:
+    - cat version.txt
+    - export CI_COMMIT_SHORT_SHA=$(cat version.txt)
+    - echo "CI_COMMIT_SHORT_SHA=${CI_COMMIT_SHORT_SHA}"
+    - echo "$CI_COMMIT_SHORT_SHA"
+  script:
+    - echo "Deploying to Staging environment..."
+    - sed -i "s/VERSION/$CI_COMMIT_SHORT_SHA/g" k8s/deployment.yml
+    - cat k8s/deployment.yml
+    - |
+      oc login $OPENSHIFT_SERVER --token=$OCP_TOKEN_DEMO_STAGING --insecure-skip-tls-verify=true
+      oc project $OPENSHIFT_PROJECT_STAGING
+      oc apply -f k8s/deployment.yml
+  only:
+    - /^release-.*$/
+  tags:
+    - master
 
-# deploy_prod:
-#   stage: deploy
-#   image: $OC_IMAGE_NAME_AND_TAG
-#   script:
-#     - echo "Deploying to Production environment..."
-#     - |
-#       oc login $OPENSHIFT_SERVER --token=$OCP_TOKEN_DEMO_PROD --insecure-skip-tls-verify=true
-#       oc project $OPENSHIFT_PROJECT_PROD
-#       oc apply -f k8s/deployment.yml
-#   only:
-#     - /^release-.*$/
-#   when: manual
-#   allow_failure: true
-  # tags:
-  #   - master
+deploy_prod:
+  stage: deploy
+  image: $OC_IMAGE_NAME_AND_TAG
+  before_script:
+    - cat version.txt
+    - export CI_COMMIT_SHORT_SHA=$(cat version.txt)
+    - echo "CI_COMMIT_SHORT_SHA=${CI_COMMIT_SHORT_SHA}"
+    - echo "$CI_COMMIT_SHORT_SHA"
+  script:
+    - echo "Deploying to Production environment..."
+    - sed -i "s/VERSION/$CI_COMMIT_SHORT_SHA/g" k8s/deployment.yml
+    - cat k8s/deployment.yml
+    - |
+      oc login $OPENSHIFT_SERVER --token=$OCP_TOKEN_DEMO_PROD --insecure-skip-tls-verify=true
+      oc project $OPENSHIFT_PROJECT_PROD
+      oc apply -f k8s/deployment.yml
+  only:
+    - /^release-.*$/
+  when: manual
+  allow_failure: true
+  tags:
+    - master
