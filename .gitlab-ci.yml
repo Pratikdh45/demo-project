@@ -55,7 +55,7 @@ docker_build:
     - mkdir -p $HOME/.docker
     - echo $DOCKER_AUTH_CONFIG > $HOME/.docker/config.json
     - echo $HOME/.docker/config.json
-    - chmod -R +x target/quarkus-app
+    - chmod -R +x target/
     - echo "Preparing for Docker image..."
   script:
     - cat version.txt
