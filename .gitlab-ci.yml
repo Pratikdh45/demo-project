@@ -3,8 +3,8 @@ stages:
 #  - test
   - docker_build
   - deploy
-  - incremental_rollout_10%
-  - incremental_rollout_100%
+  # - incremental_rollout_10%
+  # - incremental_rollout_100%
 
 variables:
   MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version"
@@ -164,52 +164,52 @@ deploy_qa:
 #   tags:
 #     - master
 
-.rollout_template: &rollout_template
-  stage: incremental rollout
-  image: $OC_IMAGE_NAME_AND_TAG
-  before_script:
-    - cat version.txt
-    - export CI_COMMIT_SHORT_SHA=$(cat version.txt)
-    - echo "CI_COMMIT_SHORT_SHA=${CI_COMMIT_SHORT_SHA}"
-    - echo "$CI_COMMIT_SHORT_SHA"
-  script:
-    - echo "Performing incremental rollout..."
-    - sed -i "s/VERSION/$CI_COMMIT_SHORT_SHA/g" k8s/deployment.yml
-    - sed -i "s/NAMESPACE/$OPENSHIFT_PROJECT_DEV/g" k8s/deployment.yml
-    - cat k8s/deployment.yml
-    - |
-      oc login $OPENSHIFT_SERVER --token=$OCP_TOKEN_DEMO --insecure-skip-tls-verify=true
-      oc project $OPENSHIFT_PROJECT_DEV
-      oc apply -f k8s/deployment.yml
-      # Perform incremental rollout logic here
-  only:
-    - /^feature-.*$/
-  tags:
-    - master
+# .rollout_template: &rollout_template
+#   stage: incremental rollout
+#   image: $OC_IMAGE_NAME_AND_TAG
+#   before_script:
+#     - cat version.txt
+#     - export CI_COMMIT_SHORT_SHA=$(cat version.txt)
+#     - echo "CI_COMMIT_SHORT_SHA=${CI_COMMIT_SHORT_SHA}"
+#     - echo "$CI_COMMIT_SHORT_SHA"
+#   script:
+#     - echo "Performing incremental rollout..."
+#     - sed -i "s/VERSION/$CI_COMMIT_SHORT_SHA/g" k8s/deployment.yml
+#     - sed -i "s/NAMESPACE/$OPENSHIFT_PROJECT_DEV/g" k8s/deployment.yml
+#     - cat k8s/deployment.yml
+#     - |
+#       oc login $OPENSHIFT_SERVER --token=$OCP_TOKEN_DEMO --insecure-skip-tls-verify=true
+#       oc project $OPENSHIFT_PROJECT_DEV
+#       oc apply -f k8s/deployment.yml
+#       # Perform incremental rollout logic here
+#   only:
+#     - /^feature-.*$/
+#   tags:
+#     - master
     
-.deploy_manual:
-  <<: *rollout_template
-  stage: prod
-  when: manual
-  only:
-    refs:
-      - /^feature-.*$/
-    kubernetes: active
-    variables:
-      - $INCREMENTAL_ROLLOUT_MODE == "manual"
-      - $INCREMENTAL_ROLLOUT_ENABLED
-  except:
-    variables:
-      - $INCREMENTAL_ROLLOUT_MODE == "timed"
+# .deploy_manual:
+#   <<: *rollout_template
+#   stage: prod
+#   when: manual
+#   only:
+#     refs:
+#       - /^feature-.*$/
+#     kubernetes: active
+#     variables:
+#       - $INCREMENTAL_ROLLOUT_MODE == "manual"
+#       - $INCREMENTAL_ROLLOUT_ENABLED
+#   except:
+#     variables:
+#       - $INCREMENTAL_ROLLOUT_MODE == "timed"
 
-timed rollout 10pct:
-  <<: *rollout_template
-  stage: incremental_rollout_10%
-  variables:
-    ROLLOUT_PERCENTAGE: 10
+# timed rollout 10pct:
+#   <<: *rollout_template
+#   stage: incremental_rollout_10%
+#   variables:
+#     ROLLOUT_PERCENTAGE: 10
 
-timed rollout 100pct:
-  <<: *rollout_template
-  stage: incremental_rollout_100%
-  variables:
-    ROLLOUT_PERCENTAGE: 100
+# timed rollout 100pct:
+#   <<: *rollout_template
+#   stage: incremental_rollout_100%
+#   variables:
+#     ROLLOUT_PERCENTAGE: 100
