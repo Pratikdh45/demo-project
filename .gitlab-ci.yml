@@ -112,6 +112,7 @@ deploy_qa:
     - |
       oc login $OPENSHIFT_SERVER --token=$OCP_TOKEN_DEMO_QA --insecure-skip-tls-verify=true
       oc project $OPENSHIFT_PROJECT_QA
+      oc apply -f k8s/service.yml
       oc apply -f k8s/deployment.yml
   only:
     - /^feature-.*$/
