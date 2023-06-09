@@ -1,14 +1,12 @@
 stages:
+  - test
   - build
-#  - test
   - docker_build
   - deploy
   # - incremental_rollout_10%
   # - incremental_rollout_100%
 
 variables:
-  MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version"
-  MAVEN_OPTS: "-Dmaven.repo.local=${CI_PROJECT_DIR}/.m2/repository"
   DOCKER_IMAGE_PREFIX: "repository/docker-private/demo-project/quarkus-helloworld"
   CI_REGISTRY_IMAGE: "172.30.38.4:8083/repository/docker-private/demo-project/quarkus-helloworld"
   OC_IMAGE_NAME_AND_TAG: "repository/docker-private/alpine:oc-4.10.4"
@@ -18,13 +16,21 @@ variables:
   OPENSHIFT_PROJECT_STAGING: "quarkus-demo-staging-project"
   OPENSHIFT_PROJECT_PROD: "quarkus-demo-prod-project"
 
+test:
+  stage: test
+  image: maven:3.8.4-openjdk-11-slim
+  script:
+    - mvn $MAVEN_CLI_OPTS test sonar:sonar -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_LOGIN -Dsonar.password=$SONAR_PASSWORD
+  tags:
+    - master
+
 build:
   stage: build
   image: maven:3.8.4-openjdk-11-slim
   script:
    - export VERSION=$(mvn --non-recursive help:evaluate -Dexpression=project.version -q -DforceStdout)
    - echo $VERSION > version.txt
-   - mvn clean package -DskipTests -Dquarkus.container-image.build=false
+   - mvn clean package
    - chmod -R +x target
   artifacts:
     paths:
@@ -32,14 +38,6 @@ build:
       - target
   tags:
     - master
-
-# test:
-#   stage: test
-#   image: maven:3.8.4-openjdk-11-slim
-#   script:
-#     - mvn $MAVEN_CLI_OPTS test sonar:sonar -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_LOGIN -Dsonar.password=$SONAR_PASSWORD
-#   tags:
-#     - master
 
 docker_build:
   stage: docker_build
@@ -90,6 +88,7 @@ deploy_dev:
       oc login $OPENSHIFT_SERVER --token=$OCP_TOKEN_DEMO --insecure-skip-tls-verify=true
       oc project $OPENSHIFT_PROJECT_DEV
       oc apply -f k8s/deployment.yml
+#      oc apply -f k8s/service.yml
   only:
     - /^feature-.*$/
   tags:
@@ -107,13 +106,13 @@ deploy_qa:
     - echo "Deploying to QA environment..."
     - sed -i "s/VERSION/$CI_COMMIT_SHORT_SHA/g" k8s/deployment.yml
     - sed -i "s/NAMESPACE/$OPENSHIFT_PROJECT_QA/g" k8s/deployment.yml
-    - sed -i "s/NAMESPACE/$OPENSHIFT_PROJECT_QA/g" k8s/service.yml
+#    - sed -i "s/NAMESPACE/$OPENSHIFT_PROJECT_QA/g" k8s/service.yml
     - cat k8s/deployment.yml
     - |
       oc login $OPENSHIFT_SERVER --token=$OCP_TOKEN_DEMO_QA --insecure-skip-tls-verify=true
       oc project $OPENSHIFT_PROJECT_QA
-      oc apply -f k8s/service.yml
       oc apply -f k8s/deployment.yml
+#      oc apply -f k8s/service.yml
   only:
     - /^feature-.*$/
   when: manual
