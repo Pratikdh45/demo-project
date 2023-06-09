@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: my-quarkus-app
-          image: 172.30.38.4:8083/repository/docker-private/demo-project/quarkus-helloworld:VERSION
+          image: IMAGE_NAME:VERSION
           ports:
             - name: http
               containerPort: 8080
