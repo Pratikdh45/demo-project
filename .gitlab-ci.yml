@@ -8,13 +8,13 @@ stages:
 
 variables:
   DOCKER_IMAGE_PREFIX: "repository/docker-private/demo-project/quarkus-helloworld"
-  CI_REGISTRY_IMAGE: "172.30.38.4:8083/repository/docker-private/demo-project/quarkus-helloworld"
-  OC_IMAGE_NAME_AND_TAG: "repository/docker-private/alpine:oc-4.10.4"
-  OPENSHIFT_SERVER: "https://api.openshift.mobicom.mn:6443"
-  OPENSHIFT_PROJECT_DEV: "quarkus-demo-project"
-  OPENSHIFT_PROJECT_QA: "quarkus-demo-qa-project"
-  OPENSHIFT_PROJECT_STAGING: "quarkus-demo-staging-project"
-  OPENSHIFT_PROJECT_PROD: "quarkus-demo-prod-project"
+  CI_REGISTRY_IMAGE: "repository/docker-private/demo-project/quarkus-helloworld"
+  OC_IMAGE_NAME_AND_TAG: ""
+  OPENSHIFT_SERVER: ""
+  OPENSHIFT_PROJECT_DEV: "demo-project"
+  OPENSHIFT_PROJECT_QA: "demo-qa-project"
+  OPENSHIFT_PROJECT_STAGING: "demo-staging-project"
+  OPENSHIFT_PROJECT_PROD: "demo-prod-project"
 
 test:
   stage: test
@@ -42,11 +42,11 @@ build:
 docker_build:
   stage: docker_build
   image:
-    name: docker:19.03.14
+    name: 
   variables:
     DOCKER_HOST: tcp://dind.gitlab-runner:2375
   services:
-  - name: docker:19.03.14-dind
+  - name: 
     entrypoint: ["env", "-u", "DOCKER_HOST"]
     command: ["dockerd-entrypoint.sh"]
   before_script:
@@ -85,7 +85,7 @@ deploy_dev:
     # - sed -i "s/NAMESPACE/$OPENSHIFT_PROJECT_DEV/g" k8s/service.yml
     - cat k8s/deployment.yml
     - |
-      oc login $OPENSHIFT_SERVER --token=$OCP_TOKEN_DEMO --insecure-skip-tls-verify=true
+      oc login $OPENSHIFT_SERVER --token=$ --insecure-skip-tls-verify=true
       oc project $OPENSHIFT_PROJECT_DEV
       oc apply -f k8s/deployment.yml
 #      oc apply -f k8s/service.yml
@@ -109,7 +109,7 @@ deploy_qa:
 #    - sed -i "s/NAMESPACE/$OPENSHIFT_PROJECT_QA/g" k8s/service.yml
     - cat k8s/deployment.yml
     - |
-      oc login $OPENSHIFT_SERVER --token=$OCP_TOKEN_DEMO_QA --insecure-skip-tls-verify=true
+      oc login $OPENSHIFT_SERVER --token=$ --insecure-skip-tls-verify=true
       oc project $OPENSHIFT_PROJECT_QA
       oc apply -f k8s/deployment.yml
 #      oc apply -f k8s/service.yml
@@ -135,7 +135,7 @@ deploy_staging:
     - sed -i "s/NAMESPACE/$OPENSHIFT_PROJECT_STAGING/g" k8s/service.yml
     - cat k8s/deployment.yml
     - |
-      oc login $OPENSHIFT_SERVER --token=$OCP_TOKEN_DEMO_STAGING --insecure-skip-tls-verify=true
+      oc login $OPENSHIFT_SERVER --token=$ --insecure-skip-tls-verify=true
       oc project $OPENSHIFT_PROJECT_STAGING
       oc apply -f k8s/deployment.yml
       oc apply -f k8s/service.yml
@@ -158,7 +158,7 @@ deploy_staging:
 #     - sed -i "s/NAMESPACE/$OPENSHIFT_PROJECT_PROD/g" k8s/deployment.yml
 #     - cat k8s/deployment.yml
 #     - |
-#       oc login $OPENSHIFT_SERVER --token=$OCP_TOKEN_DEMO_PROD --insecure-skip-tls-verify=true
+#       oc login $OPENSHIFT_SERVER --token=$ --insecure-skip-tls-verify=true
 #       oc project $OPENSHIFT_PROJECT_PROD
 #       oc apply -f k8s/deployment.yml
 #   only:
@@ -182,7 +182,7 @@ deploy_staging:
 #     - sed -i "s/NAMESPACE/$OPENSHIFT_PROJECT_DEV/g" k8s/deployment.yml
 #     - cat k8s/deployment.yml
 #     - |
-#       oc login $OPENSHIFT_SERVER --token=$OCP_TOKEN_DEMO --insecure-skip-tls-verify=true
+#       oc login $OPENSHIFT_SERVER --token=$ --insecure-skip-tls-verify=true
 #       oc project $OPENSHIFT_PROJECT_DEV
 #       oc apply -f k8s/deployment.yml
 #       # Perform incremental rollout logic here
